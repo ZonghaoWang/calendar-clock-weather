@@ -5,4 +5,5 @@ package com.example.jierui.test;
  */
 
 public class aa {
+    private int i = 1;
 }
