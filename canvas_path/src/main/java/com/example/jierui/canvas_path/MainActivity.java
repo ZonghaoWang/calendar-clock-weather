@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,8 +13,10 @@ public class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        init();
+//        init();
+
     }
+
 
     private void init() {
         // 得到屏幕尺寸
@@ -23,10 +26,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d("tag", "屏幕尺寸2：宽度 = " + w_screen + "高度 = " + h_screen + "密度 = " + dm.densityDpi);
 
 
-        LinearLayout layout=(LinearLayout) findViewById(R.id.root);
-        final DrawView view=new DrawView(this);
-        view.setMinimumHeight(500);
-        view.setMinimumWidth(300);
+        RelativeLayout layout=(RelativeLayout) findViewById(R.id.root);
+        final DrawCenter view=new DrawCenter(this);
+        //view.setMinimumHeight(500);
+        //view.setMinimumWidth(300);
         //通知view组件重绘
         view.invalidate();
         layout.addView(view);

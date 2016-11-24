@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircleButton">
+        <attr name="cb_color" format="color" />
+        <attr name="cb_pressedRingWidth" format="dimension" />
+    </declare-styleable>
+    <declare-styleable name="DrawCenterPath">
+        <attr name="main_size" format="dimension"/>
+        <attr name="temp_size" format="dimension"/>
+        <attr name="num_size" format="dimension"/>
+        <attr name="aqi_size" format="dimension"/>
+        <attr name="max_radius" format="dimension"/>
+        <attr name="center_radius" format="dimension"/>
+        <attr name="next_size" format="dimension"/>
+    </declare-styleable>
+</resources>

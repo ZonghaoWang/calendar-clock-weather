@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:weather = "http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:id="@+id/activity_main"
     android:layout_width="match_parent" android:layout_height="match_parent"
     tools:context="com.example.jierui.canvas_path.MainActivity">
-    <LinearLayout
-        android:orientation="vertical"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:id="@+id/root">
+        android:layout_height="match_parent"
+        android:id="@+id/root"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+        <com.example.jierui.canvas_path.DrawCenterPath
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_centerInParent="true"
+            android:id="@+id/drawCenter"
+            weather:aqi_size="15sp"
+            weather:main_size="20sp"
+            weather:num_size="15sp"
+            weather:temp_size="15sp"
+            weather:center_radius="100dp"
+            weather:max_radius="400dp"
+            weather:next_size="100dp">
 
-    </LinearLayout>
 
-    <Button
-        android:layout_below="@+id/root"
-        android:layout_width="360dp"
-        android:layout_height="200dp"
-        android:background="#000000"
-        android:text="wangzonghao"
-        android:textSize="40sp"
-        android:id="@+id/button" />
+        </com.example.jierui.canvas_path.DrawCenterPath>
+
+
+    </RelativeLayout>
+
+
 </RelativeLayout>
