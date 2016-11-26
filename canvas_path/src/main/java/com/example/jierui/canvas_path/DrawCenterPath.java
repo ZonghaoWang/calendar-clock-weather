@@ -238,9 +238,21 @@ public class DrawCenterPath extends View {
         super.onDraw(canvas);
     }
 
+    private void drawNowPage() {
+    }
+    private void drawHourlyPage() {
+    }
+    private void drawDailyPage() {
+    }
+    private void drawSuggestionPage() {
+    }
+    private void drawCityPage() {
+    }
 
     private float mLastX;
     private float mLastY;
+    private float clickedX;
+    private float clickedY;
     private long mDownTime;
     private float mTmpAngle;
     private boolean isFling;
@@ -249,6 +261,13 @@ public class DrawCenterPath extends View {
     private final float VISIABLE_END_ANGLE = 450;
     private final float STARTANGLE = 120;
     private final int mFlingableValue = 300;
+    private final float NOCLICK_VALUE = 5;
+
+    // 是否点击了nextButton
+    private boolean isNextButtonPressed = false;
+    // 点击是否在小圆内
+    private boolean isInCenterRadius = false;
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -263,79 +282,127 @@ public class DrawCenterPath extends View {
                 mTmpAngle = 0;
 
                 // 如果当前已经在快速滚动
-                if (isFling)
-                {
-                    // 当视图正在滚动时，移除快速滚动的回调
+                if (isFling) {
+                    // 当视图正在滚动时，移除快速滚动的回调，停止旋转，保证move时ifFling为flase
                     removeCallbacks(mFlingRunnable);
                     isFling = false;
                     return true;
                 }
-                return true;
+
+                if (inCenterRadius(x, y)) {
+                    isInCenterRadius = true;
+                    isNextButtonPressed = false;
+                    return true;
+                } else if (inNextButton(x, y)) {
+                    isNextButtonPressed = true;
+                    isInCenterRadius = false;
+                    return true;
+                } else {
+                    isNextButtonPressed = false;
+                    isInCenterRadius = false;
+                    return true;
+                }
             case MotionEvent.ACTION_MOVE:
-                /**
-                 * 获得开始的角度
-                 */
-                float start = getAngle(mLastX, mLastY);
-                /**
-                 * 获得当前的角度
-                 */
-                float end = getAngle(x, y);
-                float addedAngle = Math.abs(end - start) >= 180? (end > 180? end - 360 - start : end + 360 - start): end - start;
+                // 首先判断是否点击在中心圆之内或者nextbutton之内，如果在则屏蔽move事件
+                if (isInCenterRadius || isNextButtonPressed) {
+                    return true;
+                } else {
+                    /**
+                     * 获得开始的角度
+                     */
+                    float start = getAngle(mLastX, mLastY);
+                    /**
+                     * 获得当前的角度
+                     */
+                    float end = getAngle(x, y);
+                    float addedAngle = Math.abs(end - start) >= 180 ? (end > 180 ? end - 360 - start : end + 360 - start) : end - start;
 
-                /**
-                 * 改变page的sweep角度
-                 */
-                switch (currentPage){
-                    case now:
-                        nowSweepAngle += addedAngle;
-                        break;
-                    case hourly:
-                        hourlySweepAngle += addedAngle;
-                        break;
-                    case daily:
-                        dailySweepAngle += addedAngle;
-                        break;
-                    case suggestion:
-                        suggestionSweepAngle += addedAngle;
-                        break;
-                    case city:
-                        citySweepAngle += addedAngle;
-                        break;
+                    /**
+                     * 改变page的sweep角度，需要判断当前页，可以使得每个页面度保存自己的角度值
+                     */
+                    switch (currentPage) {
+                        case now:
+                            nowSweepAngle += addedAngle;
+                            break;
+                        case hourly:
+                            hourlySweepAngle += addedAngle;
+                            break;
+                        case daily:
+                            dailySweepAngle += addedAngle;
+                            break;
+                        case suggestion:
+                            suggestionSweepAngle += addedAngle;
+                            break;
+                        case city:
+                            citySweepAngle += addedAngle;
+                            break;
+                    }
+
+                    mTmpAngle += addedAngle;
+                    requestLayout();
+
+                    mLastX = x;
+                    mLastY = y;
+                    return true;
                 }
-
-                mTmpAngle += addedAngle;
-                requestLayout();
-
-                mLastX = x;
-                mLastY = y;
-                return true;
             case MotionEvent.ACTION_UP:
-                // 计算，每秒移动的角度
-                float anglePerSecond = mTmpAngle * 1000
-                        / (System.currentTimeMillis() - mDownTime);
-
-                // Log.e("TAG", anglePrMillionSecond + " , mTmpAngel = " +
-                // mTmpAngle);
-
-                // 如果达到该值认为是快速移动
-                if (Math.abs(anglePerSecond) > mFlingableValue && !isFling)
-                {
-                    // post一个任务，去自动滚动
-                    post(mFlingRunnable = new AutoFlingRunnable(anglePerSecond));
-
+                if (isInCenterRadius) {
                     return true;
-                }
+                } else if (isNextButtonPressed) {
+                    nextState();
+                    requestLayout();
+                } else {
+                    // 计算，每秒移动的角度
+                    float anglePerSecond = mTmpAngle * 1000
+                            / (System.currentTimeMillis() - mDownTime);
 
-                // 如果当前旋转角度超过NOCLICK_VALUE屏蔽点击
-                if (Math.abs(mTmpAngle) > NOCLICK_VALUE)
-                {
+                    // 如果达到该值认为是快速移动，在此返回并消费事件，开启线程自动减速旋转
+                    if (Math.abs(anglePerSecond) > mFlingableValue && !isFling) {
+                        // post一个任务，去自动滚动
+                        post(mFlingRunnable = new AutoFlingRunnable(anglePerSecond));
+                        return true;
+                    }
+
+                    // 如果没有快速转动，有可能（1，转速不够2， 正在转动），如果当前旋转角度超过NOCLICK_VALUE屏蔽点击
+                    if (Math.abs(mTmpAngle) < NOCLICK_VALUE) {  // 点击事件
+                        clickedX = event.getX();
+                        centerY = event.getY();
+                        requestLayout();
+                    } 
                     return true;
-                }
 
+                }
+                default:
+                    return false;
+        }
+    }
+
+    private void nextState() {
+        switch (currentPage) {
+            case now:
+                currentPage = PageSelect.hourly;
+                break;
+            case hourly:
+                currentPage = PageSelect.daily;
+                break;
+            case daily:
+                currentPage = PageSelect.suggestion;
+                break;
+            case suggestion:
+                currentPage = PageSelect.city;
+                break;
+            case city:
+                currentPage = PageSelect.now;
                 break;
         }
+    }
 
+    private boolean inNextButton(float x, float y) {
+        return Math.hypot(x - centerNextButtonX, y - centerNextButtonY) < nextSize;
+    }
 
+    private boolean inCenterRadius(float x, float y) {
+        return Math.hypot(x - centerX, y - centerY) < centerRadius;
     }
 
 
@@ -376,7 +443,7 @@ public class DrawCenterPath extends View {
             }
             isFling = true;
             // 不断改变mStartAngle，让其滚动，/30为了避免滚动太快
-            mStartAngle += (angelPerSecond / 30);
+//            mStartAngle += (angelPerSecond / 30);
             // 逐渐减小这个值
             angelPerSecond /= 1.0666F;
             postDelayed(this, 30);
