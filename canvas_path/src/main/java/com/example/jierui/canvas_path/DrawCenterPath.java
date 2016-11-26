@@ -19,6 +19,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.util.List;
+
 /**
  * Created by jierui on 2016/11/18.
  */
@@ -66,6 +68,22 @@ public class DrawCenterPath extends View {
     private float dailySweepAngle;
     private float suggestionSweepAngle;
     private float citySweepAngle;
+
+    // 每一个页面中各个元素的位置
+
+    private float[] nowAngleSet;
+    private float[] hourlyAngleSet;
+    private float[] dailyAngleSet;
+    private float[] suggestionAngleSet;
+    private float[] cityAngleSet;
+
+    private float[] nowRadius;
+    private float[] hourlyRadius;
+    private float[] dailyRadius;
+    private float[] suggestionRadius;
+    private float[] cityRadius;
+
+
 
 
 
@@ -181,28 +199,56 @@ public class DrawCenterPath extends View {
         }
 
 
+        switch (currentPage){
+            case now:
+                drawNowPage();
+                break;
+            case hourly:
+                drawHourlyPage();
+                break;
+            case daily:
+                drawDailyPage();
+                break;
+            case suggestion:
+                drawSuggestionPage();
+                break;
+            case city:
+                drawCityPage();
+                break;
+        }
+
 //        drawCity(canvas, new String[]{"北京","上海","重庆","深圳","广州","乌鲁木齐","呼和浩特","巴音郭楞"}, new int[]{1,2,3,4,5,6,7,8});
 
 
-        Paint p = new Paint();
-        p.setColor(Color.RED);// 设置红色
-        p.setAntiAlias(true);
-        p.setStyle(Paint.Style.STROKE);
-        int ss = 100;
-        p.setStrokeWidth(2 * ss);
-
-
-
-        canvas.drawCircle(centerX, centerY, phyMaxRadius - ss, p);// 小圆
-
-        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 50, "国国国", (int) mainSize);
-
-        canvas.drawBitmap(mBgBitmap, null, new Rect((int)(centerNextButtonX - nextSize / 2), (int)(centerNextButtonY - nextSize / 2), (int)(centerNextButtonX + nextSize / 2), (int)(centerNextButtonY + nextSize / 2)), null);
+//        Paint p = new Paint();
+//        p.setColor(Color.RED);// 设置红色
+//        p.setAntiAlias(true);
+//        p.setStyle(Paint.Style.STROKE);
+//        int ss = 100;
+//        p.setStrokeWidth(2 * ss);
+//
+//
+//
+//        canvas.drawCircle(centerX, centerY, phyMaxRadius - ss, p);// 小圆
+//
+//        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 50, "国国国", (int) mainSize);
+//
+//        canvas.drawBitmap(mBgBitmap, null, new Rect((int)(centerNextButtonX - nextSize / 2), (int)(centerNextButtonY - nextSize / 2), (int)(centerNextButtonX + nextSize / 2), (int)(centerNextButtonY + nextSize / 2)), null);
 
         super.onDraw(canvas);
     }
 
 
+    private float mLastX;
+    private float mLastY;
+    private long mDownTime;
+    private float mTmpAngle;
+    private boolean isFling;
+    private AutoFlingRunnable mFlingRunnable;
+    private final float VISIABLE_START_ANGLE = 90;
+    private final float VISIABLE_END_ANGLE = 450;
+    private final float STARTANGLE = 120;
+    private final int mFlingableValue = 300;
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -211,33 +257,87 @@ public class DrawCenterPath extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Log.d(TAG, "ACTIOM_DOWN:X=" + x + "__Y=" + y);
-//                mLastX = x;
-//                mLastY = y;
-//                mDownTime = System.currentTimeMillis();
-//                mTmpAngle = 0;
-//
-//                // 如果当前已经在快速滚动
-//                if (isFling)
-//                {
-//                    // 移除快速滚动的回调
-//                    removeCallbacks(mFlingRunnable);
-//                    isFling = false;
-//                    return true;
-//                }
+                mLastX = x;
+                mLastY = y;
+                mDownTime = System.currentTimeMillis();
+                mTmpAngle = 0;
+
+                // 如果当前已经在快速滚动
+                if (isFling)
+                {
+                    // 当视图正在滚动时，移除快速滚动的回调
+                    removeCallbacks(mFlingRunnable);
+                    isFling = false;
+                    return true;
+                }
                 return true;
             case MotionEvent.ACTION_MOVE:
-                Log.d(TAG, "ACTIOM_MOVE:X=" + x + "__Y=" + y);
+                /**
+                 * 获得开始的角度
+                 */
+                float start = getAngle(mLastX, mLastY);
+                /**
+                 * 获得当前的角度
+                 */
+                float end = getAngle(x, y);
+                float addedAngle = Math.abs(end - start) >= 180? (end > 180? end - 360 - start : end + 360 - start): end - start;
+
+                /**
+                 * 改变page的sweep角度
+                 */
+                switch (currentPage){
+                    case now:
+                        nowSweepAngle += addedAngle;
+                        break;
+                    case hourly:
+                        hourlySweepAngle += addedAngle;
+                        break;
+                    case daily:
+                        dailySweepAngle += addedAngle;
+                        break;
+                    case suggestion:
+                        suggestionSweepAngle += addedAngle;
+                        break;
+                    case city:
+                        citySweepAngle += addedAngle;
+                        break;
+                }
+
+                mTmpAngle += addedAngle;
+                requestLayout();
+
+                mLastX = x;
+                mLastY = y;
                 return true;
             case MotionEvent.ACTION_UP:
-                Log.d(TAG, "ACTIOM_UP:X=" + x + "__Y=" + y);
-                return true;
+                // 计算，每秒移动的角度
+                float anglePerSecond = mTmpAngle * 1000
+                        / (System.currentTimeMillis() - mDownTime);
 
-            default:
-                return true;
+                // Log.e("TAG", anglePrMillionSecond + " , mTmpAngel = " +
+                // mTmpAngle);
 
+                // 如果达到该值认为是快速移动
+                if (Math.abs(anglePerSecond) > mFlingableValue && !isFling)
+                {
+                    // post一个任务，去自动滚动
+                    post(mFlingRunnable = new AutoFlingRunnable(anglePerSecond));
+
+                    return true;
+                }
+
+                // 如果当前旋转角度超过NOCLICK_VALUE屏蔽点击
+                if (Math.abs(mTmpAngle) > NOCLICK_VALUE)
+                {
+                    return true;
+                }
+
+                break;
         }
 
+
     }
+
 
     private void drawRotateText(Canvas canvas, float cx, float cy, float r, float degree, String str, int ts) {
         RectF mRange = new RectF(cx - r, cy - r, cx + r, r + cy);
@@ -250,5 +350,53 @@ public class DrawCenterPath extends View {
         float hOffset = (float) (r * Math.PI / 20 / 2 - textWidth / 2);// 水平偏移
         float vOffset = r / 2 / 6;// 垂直偏移
         canvas.drawTextOnPath(str, path, 0, 0, mTextPaint);
+    }
+
+
+    /**
+     * 自动滚动线程
+     */
+    private class AutoFlingRunnable implements Runnable
+    {
+
+        private float angelPerSecond;
+
+        public AutoFlingRunnable(float velocity)
+        {
+            this.angelPerSecond = velocity;
+        }
+
+        public void run()
+        {
+            // 如果小于20,则停止
+            if ((int) Math.abs(angelPerSecond) < 20)
+            {
+                isFling = false;
+                return;
+            }
+            isFling = true;
+            // 不断改变mStartAngle，让其滚动，/30为了避免滚动太快
+            mStartAngle += (angelPerSecond / 30);
+            // 逐渐减小这个值
+            angelPerSecond /= 1.0666F;
+            postDelayed(this, 30);
+            // 重新布局
+            requestLayout();
+        }
+    }
+
+    /**
+     * 根据触摸的位置，计算角度
+     *
+     * @param xTouch
+     * @param yTouch
+     * @return
+     */
+    private float getAngle(float xTouch, float yTouch)
+    {
+        double x = xTouch - centerX;
+        double y = yTouch - centerY;
+        float angle = (float) (Math.acos(x / Math.hypot(x, y)) * 180 / Math.PI);
+        return y >= 0? angle : 360 - angle;
     }
 }
