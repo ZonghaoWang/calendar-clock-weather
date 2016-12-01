@@ -19,7 +19,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import okhttp3.OkHttpClient;
 
 /**
  * Created by jierui on 2016/11/18.
@@ -59,29 +67,60 @@ public class DrawCenterPath extends View {
 
 
 
+    // city (time now hours suggestion and aqi)
+    private List<String> cityName = new ArrayList<String>();
+
+
+
+
+
+
+
+
+
+
     //
-    public enum PageSelect{now, hourly, daily, suggestion, city};
-    private PageSelect currentPage = PageSelect.now;
+    public enum PageSelect{now, hourly, daily, suggestion, city, aqi};
+    private PageSelect currentPage = PageSelect.city;
     // 每个页面的扫过的角度
     private float nowSweepAngle;
     private float hourlySweepAngle;
     private float dailySweepAngle;
     private float suggestionSweepAngle;
     private float citySweepAngle;
+    private float aqiSweepAngle;
 
     // 每一个页面中各个元素的位置
+    // 每个页面各个元素的角度边界
+    private class Limit{
+        private float boud;
+        Limit(float lim){
+            boud = lim;
+        }
 
-    private float[] nowAngleSet;
-    private float[] hourlyAngleSet;
-    private float[] dailyAngleSet;
-    private float[] suggestionAngleSet;
-    private float[] cityAngleSet;
+        public float getBoud() {
+            return boud;
+        }
+
+        public void setBoud(float boud) {
+            this.boud = boud;
+        }
+    }
+    private List<Limit> nowAngleSet = new ArrayList<Limit>();
+    private List<Limit> hourlyAngleSet = new ArrayList<Limit>();
+    private List<Limit> dailyAngleSet = new ArrayList<Limit>();
+    private List<Limit> suggestionAngleSet = new ArrayList<Limit>();
+    private List<Limit> cityAngleSet = new ArrayList<Limit>();
+    private List<Limit> aqiAngleSet = new ArrayList<Limit>();
+
+
 
     private float[] nowRadius;
     private float[] hourlyRadius;
     private float[] dailyRadius;
     private float[] suggestionRadius;
     private float[] cityRadius;
+    private float[] aqiRadius;
 
 
 
@@ -201,52 +240,131 @@ public class DrawCenterPath extends View {
 
         switch (currentPage){
             case now:
-                drawNowPage();
+                drawNowPage(canvas);
                 break;
             case hourly:
-                drawHourlyPage();
+                drawHourlyPage(canvas);
                 break;
             case daily:
-                drawDailyPage();
+                drawDailyPage(canvas);
                 break;
             case suggestion:
-                drawSuggestionPage();
+                drawSuggestionPage(canvas);
                 break;
             case city:
-                drawCityPage();
+                drawCityPage(canvas);
                 break;
+            case aqi:
+                drawAqiPage(canvas);
+            
         }
 
-//        drawCity(canvas, new String[]{"北京","上海","重庆","深圳","广州","乌鲁木齐","呼和浩特","巴音郭楞"}, new int[]{1,2,3,4,5,6,7,8});
-
-
-//        Paint p = new Paint();
-//        p.setColor(Color.RED);// 设置红色
-//        p.setAntiAlias(true);
-//        p.setStyle(Paint.Style.STROKE);
-//        int ss = 100;
-//        p.setStrokeWidth(2 * ss);
-//
-//
-//
-//        canvas.drawCircle(centerX, centerY, phyMaxRadius - ss, p);// 小圆
-//
-//        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 50, "国国国", (int) mainSize);
-//
-//        canvas.drawBitmap(mBgBitmap, null, new Rect((int)(centerNextButtonX - nextSize / 2), (int)(centerNextButtonY - nextSize / 2), (int)(centerNextButtonX + nextSize / 2), (int)(centerNextButtonY + nextSize / 2)), null);
+        canvas.drawBitmap(mBgBitmap, null, new Rect((int)(centerNextButtonX - nextSize / 2), (int)(centerNextButtonY - nextSize / 2), (int)(centerNextButtonX + nextSize / 2), (int)(centerNextButtonY + nextSize / 2)), null);
 
         super.onDraw(canvas);
     }
 
-    private void drawNowPage() {
+    private void drawAqiPage(Canvas canvas) {
+        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 120 + hourlySweepAngle, "aqiSweepAngle", (int) mainSize);
+        aqiAngleSet.add(new Limit(300));
     }
-    private void drawHourlyPage() {
+
+    private void drawNowPage(Canvas canvas) {
+//        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 120 + nowSweepAngle, "北京", (int) mainSize);
+//        nowAngleSet.add(new Limit(60));
+//        cityName.clear();
+//        cityName.add("北京");
+//        cityName.add("上海");
+//        cityName.add("天津");
+//        cityName.add("重庆");
+//        cityName.add("乌鲁木齐");
+//        cityName.add("濮阳");
+//        cityName.add("邯郸");
+//        cityName.add("菏泽");
+//        cityName.add("新乡");
+//        cityName.add("郑州");
+//        cityName.add("呼和浩特");
+//        cityName.add("巴音郭楞");
+//        cityName.add("哈尔滨");
+//        cityName.add("纽约");
+//        float textRadius = phyMaxRadius - mainSize;
+//        RectF mRange = new RectF(centerX - textRadius, centerY - textRadius, centerX + textRadius, centerY + textRadius);
+//
+//        Paint mTextPaint = new Paint();
+//        mTextPaint.setColor(Color.BLACK);
+//        mTextPaint.setTextSize(mainSize);
+//        float eachAngle = cityName.size() >= 5? 60 : 300 / cityName.size();
+//        int i = 0;
+//        for (String str : cityName){
+//            if (120 + nowSweepAngle + eachAngle * (i + 0.5)>= VISIABLE_START_ANGLE && 120 + nowSweepAngle + eachAngle * (i + 0.5) <= VISIABLE_END_ANGLE){
+//                Path path = new Path();
+//                path.addArc(mRange, 120 + nowSweepAngle + eachAngle * i, eachAngle);
+//                float textWidth = mTextPaint.measureText(str);
+//                float hOffset = (float) (textRadius * Math.PI / 360 * eachAngle - textWidth / 2);// 水平偏移
+//                float vOffset = textRadius / 2 / 6;// 垂直偏移
+//                canvas.drawTextOnPath(str, path, hOffset, 0, mTextPaint);
+//            }
+//
+//            i += 1;
+//            nowAngleSet.add(new Limit(eachAngle * i));
+//        }
+
+
+
     }
-    private void drawDailyPage() {
+    private void drawHourlyPage(Canvas canvas) {
+        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 120 + hourlySweepAngle, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())), (int) mainSize);
+        hourlyAngleSet.add(new Limit(300));
     }
-    private void drawSuggestionPage() {
+    private void drawDailyPage(Canvas canvas) {
+        try {
+            drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 120 + dailySweepAngle, new SimpleDateFormat("HH:mm").format(new SimpleDateFormat("yyyy-MM-dd HH/mm").parse("2016-12-01 20/51")), (int) mainSize);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        dailyAngleSet.add(new Limit(300));
     }
-    private void drawCityPage() {
+    private void drawSuggestionPage(Canvas canvas) {
+        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 120 + suggestionSweepAngle, "suggestionSweepAngle", (int) mainSize);
+        suggestionAngleSet.add(new Limit(300));;
+    }
+    private void drawCityPage(Canvas canvas) {
+
+        cityName.clear();
+        cityName.add("北京");
+        cityName.add("上海");
+        cityName.add("天津");
+        cityName.add("重庆");
+        cityName.add("乌鲁木齐");
+        cityName.add("濮阳");
+        cityName.add("邯郸");
+        cityName.add("菏泽");
+        cityName.add("新乡");
+        cityName.add("郑州");
+        cityName.add("呼和浩特");
+        cityName.add("巴音郭楞");
+        cityName.add("哈尔滨");
+        cityName.add("纽约");
+
+        float textRadius = phyMaxRadius - mainSize;
+        RectF mRange = new RectF(centerX - textRadius, centerY - textRadius, centerX + textRadius, centerY + textRadius);
+
+        Paint mTextPaint = new Paint();
+        mTextPaint.setColor(Color.BLACK);
+        mTextPaint.setTextSize(mainSize);
+        float eachAngle = cityName.size() >= 5 ? 60 : 300 / cityName.size();
+        for (int i = 0; i < cityName.size(); i++) {
+            if (120 + citySweepAngle + eachAngle * (i + 0.5) >= VISIABLE_START_ANGLE && 120 + citySweepAngle + eachAngle * (i + 0.5) <= VISIABLE_END_ANGLE) {
+                Path path = new Path();
+                path.addArc(mRange, 120 + citySweepAngle + eachAngle * i, eachAngle);
+                float textWidth = mTextPaint.measureText(cityName.get(i));
+                float hOffset = (float) (textRadius * Math.PI / 360 * eachAngle - textWidth / 2);// 水平偏移
+                float vOffset = textRadius / 2 / 6;// 垂直偏移
+                canvas.drawTextOnPath(cityName.get(i), path, hOffset, 0, mTextPaint);
+            }
+
+            cityAngleSet.add(new Limit(eachAngle * (i + 1)));
+        }
     }
 
     private float mLastX;
@@ -260,7 +378,8 @@ public class DrawCenterPath extends View {
     private final float VISIABLE_START_ANGLE = 90;
     private final float VISIABLE_END_ANGLE = 450;
     private final float STARTANGLE = 120;
-    private final int mFlingableValue = 300;
+    private final float ANGLE_DECRASE_RATIO = 1.0666F;
+    private final int mFlingableValue = 15;
     private final float NOCLICK_VALUE = 5;
 
     // 是否点击了nextButton
@@ -322,19 +441,22 @@ public class DrawCenterPath extends View {
                      */
                     switch (currentPage) {
                         case now:
-                            nowSweepAngle += addedAngle;
+                            nowSweepAngle += comAngle(nowSweepAngle, addedAngle, 30f, 270 - nowAngleSet.get(nowAngleSet.size() - 1).getBoud());
                             break;
                         case hourly:
-                            hourlySweepAngle += addedAngle;
+                            hourlySweepAngle += comAngle(hourlySweepAngle, addedAngle, 30f, 270 - hourlyAngleSet.get(hourlyAngleSet.size() - 1).getBoud());
                             break;
                         case daily:
-                            dailySweepAngle += addedAngle;
+                            dailySweepAngle += comAngle(dailySweepAngle, addedAngle, 30f, 270 - dailyAngleSet.get(dailyAngleSet.size() - 1).getBoud());
                             break;
                         case suggestion:
-                            suggestionSweepAngle += addedAngle;
+                            suggestionSweepAngle += comAngle(suggestionSweepAngle, addedAngle, 30f, 270 - suggestionAngleSet.get(suggestionAngleSet.size() - 1).getBoud());
                             break;
                         case city:
-                            citySweepAngle += addedAngle;
+                            citySweepAngle += comAngle(citySweepAngle, addedAngle, 30f, 270 - cityAngleSet.get(cityAngleSet.size() - 1).getBoud());
+                            break;
+                        case aqi:
+                            aqiSweepAngle += comAngle(aqiSweepAngle, addedAngle, 30f, 270 - aqiAngleSet.get(aqiAngleSet.size() - 1).getBoud());
                             break;
                     }
 
@@ -351,6 +473,7 @@ public class DrawCenterPath extends View {
                 } else if (isNextButtonPressed) {
                     nextState();
                     requestLayout();
+                    return true;
                 } else {
                     // 计算，每秒移动的角度
                     float anglePerSecond = mTmpAngle * 1000
@@ -377,28 +500,42 @@ public class DrawCenterPath extends View {
         }
     }
 
+    private float comAngle(float nowAngle, float addedAngle, float maxValue, float minValue) {
+        if (nowAngle + addedAngle >= maxValue){
+            return (maxValue - nowAngle) / 2;
+        }else if (nowAngle + addedAngle <= minValue){
+            return (minValue - nowAngle) / 2;
+        } else {
+            return addedAngle;
+        }
+
+    }
+
     private void nextState() {
         switch (currentPage) {
             case now:
-                currentPage = PageSelect.hourly;
+                currentPage = PageSelect.now;
                 break;
             case hourly:
-                currentPage = PageSelect.daily;
+                currentPage = PageSelect.aqi;
                 break;
             case daily:
-                currentPage = PageSelect.suggestion;
+                currentPage = PageSelect.hourly;
                 break;
             case suggestion:
                 currentPage = PageSelect.city;
                 break;
             case city:
-                currentPage = PageSelect.now;
+                currentPage = PageSelect.daily;
+                break;
+            case aqi:
+                currentPage = PageSelect.suggestion;
                 break;
         }
     }
 
     private boolean inNextButton(float x, float y) {
-        return Math.hypot(x - centerNextButtonX, y - centerNextButtonY) < nextSize;
+        return Math.hypot(x - centerNextButtonX, y - centerNextButtonY) < nextSize / 2;
     }
 
     private boolean inCenterRadius(float x, float y) {
@@ -410,7 +547,7 @@ public class DrawCenterPath extends View {
         RectF mRange = new RectF(cx - r, cy - r, cx + r, r + cy);
         Path path = new Path();
         Paint mTextPaint = new Paint();
-        mTextPaint.setColor(0xFFffffff);
+        mTextPaint.setColor(Color.BLACK);
         mTextPaint.setTextSize(ts);
         path.addArc(mRange, degree, 250);
         float textWidth = mTextPaint.measureText(str);
@@ -435,6 +572,25 @@ public class DrawCenterPath extends View {
 
         public void run()
         {
+            switch (currentPage){
+                case now:
+                    nowRun();
+                    break;
+                case hourly:
+                    hourlyRun();
+                    break;
+                case daily:
+                    dailyRun();
+                    break;
+                case suggestion:
+                    suggestionRun();
+                    break;
+                case city:
+                    cityRun();
+                    break;
+                case aqi:
+                    aqiRun();
+            }
             // 如果小于20,则停止
             if ((int) Math.abs(angelPerSecond) < 20)
             {
@@ -449,6 +605,70 @@ public class DrawCenterPath extends View {
             postDelayed(this, 30);
             // 重新布局
             requestLayout();
+            return;
+        }
+
+        private void aqiRun() {
+            if (aqiSweepAngle >= 0){
+                aqiSweepAngle -= Math.min(Math.abs((angelPerSecond / 30)), aqiSweepAngle);
+            } else if (aqiSweepAngle <= 300 - aqiAngleSet.get(aqiAngleSet.size() - 1).getBoud()){
+                aqiSweepAngle += Math.min(Math.abs(angelPerSecond / 30), 300 - aqiAngleSet.get(aqiAngleSet.size() - 1).getBoud() - aqiSweepAngle);
+            }else{
+                aqiSweepAngle += (angelPerSecond / 30);
+            }
+        }
+
+
+        private void hourlyRun() {
+
+            if (hourlySweepAngle >= 0){
+                hourlySweepAngle -= Math.min(Math.abs((angelPerSecond / 30)), hourlySweepAngle);
+            } else if (hourlySweepAngle <= 300 - hourlyAngleSet.get(hourlyAngleSet.size() - 1).getBoud()){
+                hourlySweepAngle += Math.min(Math.abs(angelPerSecond / 30), 300 - hourlyAngleSet.get(hourlyAngleSet.size() - 1).getBoud() - hourlySweepAngle);
+            }else{
+                hourlySweepAngle += (angelPerSecond / 30);
+            }
+        }
+
+        private void nowRun() {
+
+            if (nowSweepAngle >= 0){
+                nowSweepAngle -= Math.min(Math.abs(angelPerSecond / 30), nowSweepAngle);
+            } else if (nowSweepAngle <= 300 - nowAngleSet.get(nowAngleSet.size() - 1).getBoud()){
+                nowSweepAngle += Math.min(Math.abs(angelPerSecond / 30), 300 - nowAngleSet.get(nowAngleSet.size() - 1).getBoud() - nowSweepAngle);
+            }else {
+                nowSweepAngle += (angelPerSecond / 30);
+            }
+        }
+        private void cityRun(){
+
+            if (citySweepAngle >= 0){
+                citySweepAngle -= Math.min(Math.abs((angelPerSecond / 30)), citySweepAngle);
+            } else if (citySweepAngle <= 300 - cityAngleSet.get(cityAngleSet.size() - 1).getBoud()){
+                citySweepAngle += Math.min(Math.abs(angelPerSecond / 30), 300 - cityAngleSet.get(cityAngleSet.size() - 1).getBoud() - citySweepAngle);
+            }else{
+                citySweepAngle += (angelPerSecond / 30);
+            }
+        }
+        private void suggestionRun(){
+
+            if (suggestionSweepAngle >= 0){
+                suggestionSweepAngle -= Math.min(Math.abs((angelPerSecond / 30)), suggestionSweepAngle);
+            } else if (suggestionSweepAngle <= 300 - suggestionAngleSet.get(suggestionAngleSet.size() - 1).getBoud()){
+                suggestionSweepAngle += Math.min(Math.abs(angelPerSecond / 30), 300 - suggestionAngleSet.get(suggestionAngleSet.size() - 1).getBoud() -suggestionSweepAngle);
+            }else{
+                suggestionSweepAngle += (angelPerSecond / 30);
+            }
+        }
+        private void dailyRun(){
+
+            if (dailySweepAngle >= 0){
+                dailySweepAngle -= Math.min(Math.abs((angelPerSecond / 30)), dailySweepAngle);
+            } else if (dailySweepAngle <= 300 - dailyAngleSet.get(dailyAngleSet.size() - 1).getBoud()){
+                dailySweepAngle += Math.min(Math.abs(angelPerSecond / 30), 300 - dailyAngleSet.get(dailyAngleSet.size() - 1).getBoud() - dailySweepAngle);
+            }else{
+                dailySweepAngle += (angelPerSecond / 30);
+            }
         }
     }
 
@@ -465,5 +685,39 @@ public class DrawCenterPath extends View {
         double y = yTouch - centerY;
         float angle = (float) (Math.acos(x / Math.hypot(x, y)) * 180 / Math.PI);
         return y >= 0? angle : 360 - angle;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // set get add
+    public List<String> getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(List<String> cityName) {
+        this.cityName = cityName;
+    }
+
+    public void addCity(String str){
+        if (!cityName.contains(str)){
+            cityName.add(str);
+        }
     }
 }
