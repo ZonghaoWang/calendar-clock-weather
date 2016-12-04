@@ -1,5 +1,6 @@
 package weatherHelper;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -24,7 +25,52 @@ public class Suggestion {
     private String uvBrf;
     private String uvTxt;
 
-    public Suggestion(JSONObject suggestion) {
+    public Suggestion(JSONObject jsonObject) {
+        try {
+            JSONObject jsonObjectAir = jsonObject.isNull("air")? null : jsonObject.getJSONObject("air");
+            JSONObject jsonObjectComf = jsonObject.isNull("comf")? null : jsonObject.getJSONObject("comf");
+            JSONObject jsonObjectCw = jsonObject.isNull("cw")? null : jsonObject.getJSONObject("cw");
+            JSONObject jsonObjectDrsg = jsonObject.isNull("drsg")? null : jsonObject.getJSONObject("drsg");
+            JSONObject jsonObjectFlu = jsonObject.isNull("flu")? null : jsonObject.getJSONObject("flu");
+            JSONObject jsonObjectSport = jsonObject.isNull("sport")? null : jsonObject.getJSONObject("sport");
+            JSONObject jsonObjectTrav = jsonObject.isNull("trav")? null : jsonObject.getJSONObject("trav");
+            JSONObject jsonObjectUv = jsonObject.isNull("uv")? null : jsonObject.getJSONObject("uv");
+
+            if (jsonObjectAir != null){
+                airBrf = jsonObjectAir.isNull("brf")? null : jsonObjectAir.getString("brf");
+                airTxt = jsonObjectAir.isNull("txt")? null : jsonObjectAir.getString("txt");
+            }
+            if (jsonObjectComf != null){
+                comfBrf = jsonObjectComf.isNull("brf")? null : jsonObjectComf.getString("brf");
+                comfTxt = jsonObjectComf.isNull("txt")? null : jsonObjectComf.getString("txt");
+            }
+            if (jsonObjectCw != null){
+                cwBrf = jsonObjectCw.isNull("brf")? null : jsonObjectCw.getString("brf");
+                cwTxt = jsonObjectCw.isNull("txt")? null : jsonObjectCw.getString("txt");
+            }
+            if (jsonObjectDrsg != null){
+                drsgBrf = jsonObjectDrsg.isNull("brf")? null : jsonObjectDrsg.getString("brf");
+                drsgTxt = jsonObjectDrsg.isNull("txt")? null : jsonObjectDrsg.getString("txt");
+            }
+            if (jsonObjectFlu != null){
+                fluBrf = jsonObjectFlu.isNull("brf")? null : jsonObjectFlu.getString("brf");
+                fluTxt = jsonObjectFlu.isNull("txt")? null : jsonObjectFlu.getString("txt");
+            }
+            if (jsonObjectSport != null){
+                sportBrf = jsonObjectSport.isNull("brf")? null : jsonObjectSport.getString("brf");
+                sportTxt = jsonObjectSport.isNull("txt")? null : jsonObjectSport.getString("txt");
+            }
+            if (jsonObjectTrav != null){
+                travBrf = jsonObjectTrav.isNull("brf")? null : jsonObjectTrav.getString("brf");
+                travTxt = jsonObjectTrav.isNull("txt")? null : jsonObjectTrav.getString("txt");
+            }
+            if (jsonObjectUv != null){
+                uvBrf = jsonObjectUv.isNull("brf")? null : jsonObjectUv.getString("brf");
+                uvTxt = jsonObjectUv.isNull("txt")? null : jsonObjectUv.getString("txt");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 

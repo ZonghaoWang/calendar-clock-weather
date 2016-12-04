@@ -1,5 +1,6 @@
 package weatherHelper;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import weatherHelper.sonClass.Wind;
@@ -11,7 +12,7 @@ import weatherHelper.sonClass.Wind;
 public class Now {
     private String condCode;
     private String condTxt;
-    private String f1;
+    private String fl;
     private String hum;
     private String pcpn;
     private String pres;
@@ -19,7 +20,23 @@ public class Now {
     private String vis;
     private Wind wind;
 
-    public Now(JSONObject now) {
+    public Now(JSONObject jsonObject) {
+        try {
+            this.fl = jsonObject.isNull("fl")? null : jsonObject.getString("fl");
+            this.hum = jsonObject.isNull("hum")? null : jsonObject.getString("hum");
+            this.pcpn = jsonObject.isNull("pcpn")? null : jsonObject.getString("pcpn");
+            this.pres = jsonObject.isNull("pres")? null : jsonObject.getString("pres");
+            this.tmp = jsonObject.isNull("tmp")? null : jsonObject.getString("tmp");
+            this.vis = jsonObject.isNull("vis")? null : jsonObject.getString("vis");
+            JSONObject jsonObjectCond = jsonObject.isNull("cond")? null : jsonObject.getJSONObject("cond");
+            if (jsonObjectCond != null) {
+                this.condCode = jsonObjectCond.isNull("code") ? null : jsonObjectCond.getString("code");
+                this.condTxt = jsonObjectCond.isNull("txt") ? null : jsonObjectCond.getString("txt");
+            }
+            this.wind = jsonObject.isNull("wind")? null : new Wind(jsonObject.getJSONObject("wind"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -39,12 +56,12 @@ public class Now {
         this.condTxt = condTxt;
     }
 
-    public String getF1() {
-        return f1;
+    public String getFl() {
+        return fl;
     }
 
-    public void setF1(String f1) {
-        this.f1 = f1;
+    public void setFl(String f1) {
+        this.fl = f1;
     }
 
     public String getHum() {

@@ -1,5 +1,6 @@
 package weatherHelper;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -16,8 +17,24 @@ public class Aqi {
     private String qlty;
     private String so2;
 
-    public Aqi(JSONObject aqi) {
-        return;
+    public Aqi(JSONObject jsonObject) {
+        if (!jsonObject.isNull("city")){
+            try {
+                jsonObject = jsonObject.getJSONObject("city");
+                this.aqi = jsonObject.isNull("aqi")? null : jsonObject.getString("aqi");
+                this.co = jsonObject.isNull("co")? null : jsonObject.getString("co");
+                this.no2 = jsonObject.isNull("no2")? null : jsonObject.getString("no2");
+                this.o3 = jsonObject.isNull("o3")? null : jsonObject.getString("o3");
+                this.pm10 = jsonObject.isNull("pm10")? null : jsonObject.getString("pm10");
+                this.pm25 = jsonObject.isNull("pm25")? null : jsonObject.getString("pm25");
+                this.qlty = jsonObject.isNull("qlty")? null : jsonObject.getString("qlty");
+                this.so2 = jsonObject.isNull("so2")? null : jsonObject.getString("so2");
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public String getAqi() {

@@ -11,6 +11,8 @@ import android.graphics.Path;
 import android.graphics.PathDashPathEffect;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import okhttp3.OkHttpClient;
+import weatherHelper.Heweather5;
 
 /**
  * Created by jierui on 2016/11/18.
@@ -69,6 +72,10 @@ public class DrawCenterPath extends View {
 
     // city (time now hours suggestion and aqi)
     private List<String> cityName = new ArrayList<String>();
+    private List<Heweather5> weatherInfoList = new ArrayList<Heweather5>();
+    private String currentCity;
+    private Heweather5 currentHeweather5;
+
 
 
 
@@ -177,9 +184,37 @@ public class DrawCenterPath extends View {
                 }
             }
             a.recycle();
+
+
         }
 
     }
+
+
+    Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 0:
+                    //完成主界面更新,拿到数据
+                    Heweather5  heweather5 = (Heweather5) msg.obj;
+                    weatherInfoList.add(heweather5);
+                    if (heweather5.getCityName().equals(currentCity)){
+                        currentHeweather5 = heweather5;
+                    }
+                    requestLayout();
+                    Log.d("tag", heweather5.getCityName());
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+    };
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -329,29 +364,30 @@ public class DrawCenterPath extends View {
         suggestionAngleSet.add(new Limit(300));;
     }
     private void drawCityPage(Canvas canvas) {
-
-        cityName.clear();
-        cityName.add("北京");
-        cityName.add("上海");
-        cityName.add("天津");
-        cityName.add("重庆");
-        cityName.add("乌鲁木齐");
-        cityName.add("濮阳");
-        cityName.add("邯郸");
-        cityName.add("菏泽");
-        cityName.add("新乡");
-        cityName.add("郑州");
-        cityName.add("呼和浩特");
-        cityName.add("巴音郭楞");
-        cityName.add("哈尔滨");
-        cityName.add("纽约");
-
         float textRadius = phyMaxRadius - mainSize;
-        RectF mRange = new RectF(centerX - textRadius, centerY - textRadius, centerX + textRadius, centerY + textRadius);
 
+
+        Paint circlePaint = new Paint();
+        circlePaint.setColor(Color.RED);
+        circlePaint.setStyle(Paint.Style.STROKE);
+        circlePaint.setStrokeWidth(4);
         Paint mTextPaint = new Paint();
         mTextPaint.setColor(Color.BLACK);
         mTextPaint.setTextSize(mainSize);
+        Paint nTextPaint = new Paint();
+        nTextPaint.setColor(Color.BLACK);
+        nTextPaint.setTextSize(numSize);
+
+        // 内圈文字半径， mrange main文字的半径, nrange 温度天气的半径
+        // 包围文字的两个圆
+
+        float innerRadius = textRadius - mTextPaint.getFontMetrics().descent - numSize;
+        canvas.drawCircle(centerX, centerY, textRadius + mainSize, circlePaint);
+        canvas.drawCircle(centerX, centerY, textRadius - mTextPaint.getFontMetrics().descent, circlePaint);
+        canvas.drawCircle(centerX, centerY, innerRadius - nTextPaint.getFontMetrics().descent, circlePaint);
+        RectF mRange = new RectF(centerX - textRadius, centerY - textRadius, centerX + textRadius, centerY + textRadius);
+        RectF nRange = new RectF(centerX - innerRadius, centerY - innerRadius, centerX + innerRadius, centerY + innerRadius);
+
         float eachAngle = cityName.size() >= 5 ? 60 : 300 / cityName.size();
         for (int i = 0; i < cityName.size(); i++) {
             if (120 + citySweepAngle + eachAngle * (i + 0.5) >= VISIABLE_START_ANGLE && 120 + citySweepAngle + eachAngle * (i + 0.5) <= VISIABLE_END_ANGLE) {
@@ -359,11 +395,32 @@ public class DrawCenterPath extends View {
                 path.addArc(mRange, 120 + citySweepAngle + eachAngle * i, eachAngle);
                 float textWidth = mTextPaint.measureText(cityName.get(i));
                 float hOffset = (float) (textRadius * Math.PI / 360 * eachAngle - textWidth / 2);// 水平偏移
-                float vOffset = textRadius / 2 / 6;// 垂直偏移
                 canvas.drawTextOnPath(cityName.get(i), path, hOffset, 0, mTextPaint);
+                for (int j = 0; j < weatherInfoList.size(); j++){
+                    Heweather5 heweather5 = weatherInfoList.get(j);
+                    if (heweather5.getCityName().equals(cityName.get(i))){
+                        String str = heweather5.getNow().getCondTxt() + "  " + heweather5.getDailyForecast().get(0).getTmp().getMin() + "~" + heweather5.getDailyForecast().get(0).getTmp().getMax();
+                        Path pathn = new Path();
+                        pathn.addArc(nRange, 120 + citySweepAngle + eachAngle * i, eachAngle);
+                        float textWidthn = nTextPaint.measureText(str);
+                        float hOffsetn = (float) (innerRadius * Math.PI / 360 * eachAngle - textWidthn / 2);// 水平偏移
+                        canvas.drawTextOnPath(str, pathn, hOffsetn, 0, nTextPaint);
+                    }
+                }
             }
 
+
             cityAngleSet.add(new Limit(eachAngle * (i + 1)));
+            if (citySweepAngle > 0){
+                float width = mainSize + mTextPaint.getFontMetrics().descent +nTextPaint.getFontMetrics().descent + numSize;
+                float radius = phyMaxRadius - 1/2 * width;
+                RectF rectF = new RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+                Paint startAreaPaint = new Paint();
+                startAreaPaint.setStyle(Paint.Style.STROKE);
+                startAreaPaint.setStrokeWidth(width);
+                canvas.drawArc(rectF, 90, citySweepAngle + 120, true, startAreaPaint);
+
+            }
         }
     }
 
@@ -718,6 +775,23 @@ public class DrawCenterPath extends View {
     public void addCity(String str){
         if (!cityName.contains(str)){
             cityName.add(str);
+            Heweather5 heweather5 = new Heweather5(mHandler, str);
+            if (cityName.size() == 1){
+                currentCity = cityName.get(0);
+            }
+        }
+    }
+    private void deleteCity(String city){
+        if (cityName!=null){
+            cityName.remove(city);
+        }
+        if (weatherInfoList!=null){
+            for (int i = 0; i < weatherInfoList.size(); i++){
+                if (weatherInfoList.get(i).getCityName().equals(city)){
+                    weatherInfoList.remove(i);
+                    i--;
+                }
+            }
         }
     }
 }

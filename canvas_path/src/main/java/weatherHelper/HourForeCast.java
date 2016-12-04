@@ -1,5 +1,8 @@
 package weatherHelper;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import weatherHelper.sonClass.Wind;
 
 /**
@@ -16,7 +19,24 @@ public class HourForeCast {
     private String tmp;
     private Wind wind;
 
-    public HourForeCast(Object o) {
+    public HourForeCast(JSONObject jsonObject) {
+        JSONObject jsonObjectCond = null;
+        try {
+            this.date = jsonObject.isNull("date")? null : jsonObject.getString("date");
+            this.hum = jsonObject.isNull("hum")? null : jsonObject.getString("hum");
+            this.pop = jsonObject.isNull("pop")? null : jsonObject.getString("pop");
+            this.pres = jsonObject.isNull("pres")? null : jsonObject.getString("pres");
+            this.tmp = jsonObject.isNull("tmp")? null : jsonObject.getString("tmp");
+            this.wind = jsonObject.isNull("wind")? null : new Wind(jsonObject.getJSONObject("wind"));
+            jsonObjectCond = jsonObject.isNull("cond")? null : jsonObject.getJSONObject("cond");
+            if (jsonObjectCond != null) {
+                this.condCode = jsonObjectCond.isNull("code") ? null : jsonObjectCond.getString("code");
+                this.condTxt = jsonObjectCond.isNull("txt") ? null : jsonObjectCond.getString("txt");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
     }
 

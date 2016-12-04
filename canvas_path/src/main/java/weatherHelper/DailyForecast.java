@@ -1,5 +1,8 @@
 package weatherHelper;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import weatherHelper.sonClass.Astro;
 import weatherHelper.sonClass.Cond;
 import weatherHelper.sonClass.Tmp;
@@ -22,7 +25,22 @@ public class DailyForecast {
     private String vis;
     private Wind wind;
 
-    public DailyForecast(Object o) {
+    public DailyForecast(JSONObject jsonObject) {
+        try {
+            this.date = jsonObject.isNull("date")? null : jsonObject.getString("date");
+            this.hum = jsonObject.isNull("hum")? null : jsonObject.getString("hum");
+            this.pcpn = jsonObject.isNull("pcpn")? null : jsonObject.getString("pcpn");
+            this.pop = jsonObject.isNull("pop")? null : jsonObject.getString("pop");
+            this.pres = jsonObject.isNull("pres")? null : jsonObject.getString("pres");
+            this.uv = jsonObject.isNull("uv")? null : jsonObject.getString("uv");
+            this.vis = jsonObject.isNull("vis")? null : jsonObject.getString("vis");
+            this.astro = jsonObject.isNull("astro")? null : new Astro(jsonObject.getJSONObject("astro"));
+            this.cond = jsonObject.isNull("cond")? null : new Cond(jsonObject.getJSONObject("cond"));
+            this.wind = jsonObject.isNull("wind")? null : new Wind(jsonObject.getJSONObject("wind"));
+            this.tmp = jsonObject.isNull("tmp")? null : new Tmp(jsonObject.getJSONObject("tmp"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public Astro getAstro() {

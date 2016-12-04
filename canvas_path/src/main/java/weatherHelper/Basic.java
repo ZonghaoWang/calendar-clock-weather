@@ -1,5 +1,6 @@
 package weatherHelper;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import weatherHelper.sonClass.Update;
@@ -16,7 +17,19 @@ public class Basic {
     private String lon;
     private Update update;
 
-    public Basic(JSONObject basic) {
+    public Basic(JSONObject jsonObject) {
+        try {
+            this.city = jsonObject.isNull("city")? null : jsonObject.getString("city");
+            this.cnty = jsonObject.isNull("cnty")? null : jsonObject.getString("cnty");
+            this.id = jsonObject.isNull("id")? null : jsonObject.getString("id");
+            this.lat = jsonObject.isNull("lat")? null : jsonObject.getString("lat");
+            this.lon = jsonObject.isNull("lon")? null : jsonObject.getString("lon");
+            this.update = jsonObject.isNull("update")? null : new Update(jsonObject.getJSONObject("update"));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public String getCity() {
