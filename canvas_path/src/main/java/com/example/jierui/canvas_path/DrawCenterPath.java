@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import okhttp3.OkHttpClient;
 import weatherHelper.Heweather5;
 
 /**
@@ -76,6 +75,17 @@ public class DrawCenterPath extends View {
     private String currentCity;
     private Heweather5 currentHeweather5;
 
+    // 定义接口
+    public interface OnItemClickListener{
+        void onClick(Heweather5 heweather5);
+    }
+    private OnItemClickListener mItemClickListener;
+    /**
+     * 子函数回调set
+     */
+    public void setOnItemClickListener(OnItemClickListener listener){
+        this.mItemClickListener = listener;
+    }
 
 
 
@@ -411,16 +421,17 @@ public class DrawCenterPath extends View {
 
 
             cityAngleSet.add(new Limit(eachAngle * (i + 1)));
-            if (citySweepAngle > 0){
-                float width = mainSize + mTextPaint.getFontMetrics().descent +nTextPaint.getFontMetrics().descent + numSize;
-                float radius = phyMaxRadius - 1/2 * width;
-                RectF rectF = new RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
-                Paint startAreaPaint = new Paint();
-                startAreaPaint.setStyle(Paint.Style.STROKE);
-                startAreaPaint.setStrokeWidth(width);
-                canvas.drawArc(rectF, 90, citySweepAngle + 120, true, startAreaPaint);
-
-            }
+            // 画开始的图像
+//            if (citySweepAngle > 0){
+//                float width = mainSize + mTextPaint.getFontMetrics().descent +nTextPaint.getFontMetrics().descent + numSize;
+//                float radius = phyMaxRadius - width;
+//                RectF rectF = new RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+//                Paint startAreaPaint = new Paint();
+//                startAreaPaint.setStyle(Paint.Style.STROKE);
+//                startAreaPaint.setStrokeWidth(width);
+//                canvas.drawArc(rectF, 90, citySweepAngle + 120, false, startAreaPaint);
+//
+//            }
         }
     }
 
@@ -428,6 +439,7 @@ public class DrawCenterPath extends View {
     private float mLastY;
     private float clickedX;
     private float clickedY;
+    private float clickedAngle;
     private long mDownTime;
     private float mTmpAngle;
     private boolean isFling;
@@ -546,9 +558,42 @@ public class DrawCenterPath extends View {
                     // 如果没有快速转动，有可能（1，转速不够2， 正在转动），如果当前旋转角度超过NOCLICK_VALUE屏蔽点击
                     if (Math.abs(mTmpAngle) < NOCLICK_VALUE) {  // 点击事件
                         clickedX = event.getX();
-                        centerY = event.getY();
+                        clickedY = event.getY();
+                        clickedAngle = getAngle(clickedX, clickedY);
+                        switch (currentPage){
+                            case now:
+                                break;
+                            case hourly:
+                                break;
+                            case daily:
+                                break;
+                            case suggestion:
+                                break;
+                            case city:
+                                clickedAngle = clickedAngle <= 90? 360 + clickedAngle : clickedAngle;
+
+                                float siteAngle = clickedAngle - citySweepAngle - STARTANGLE;
+                                int cityNameIndex = 0;
+                                for (int i = 0; i < cityAngleSet.size(); i++){
+                                    if (siteAngle < cityAngleSet.get(i).getBoud()){
+                                        cityNameIndex = i;
+                                        break;
+                                    }
+                                }
+                                for (int i = 0; i < weatherInfoList.size(); i++){
+                                    if (weatherInfoList.get(i).getCityName().equals(cityName.get(cityNameIndex))){
+                                        mItemClickListener.onClick(weatherInfoList.get(i));
+                                        break;
+                                    }
+                                }
+
+                                break;
+                            case aqi:
+                                break;
+                        }
+//
                         requestLayout();
-                    } 
+                    }
                     return true;
 
                 }

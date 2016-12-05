@@ -1,25 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:weather = "http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:id="@+id/activity_main"
     android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.example.jierui.canvas_path.MainActivity">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/tmp_layout">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="55dp"
+            android:textSize="50sp"
+            android:text="N/A"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/now_tmp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginTop="8dp"
+            android:textSize="15dp"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@id/now_tmp"
+            android:text="o"
+            android:id="@+id/o_tmp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_below="@id/now_tmp"
+            android:layout_marginLeft="10dp"
+            android:textSize="20sp"
+            android:text="N/A"
+            android:id="@+id/city_tmp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_below="@id/now_tmp"
+            android:layout_marginLeft="2dp"
+            android:textSize="20sp"
+            android:text="|"
+            android:layout_toRightOf="@id/city_tmp"
+            android:id="@+id/spar"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_below="@id/now_tmp"
+            android:layout_marginLeft="2dp"
+            android:layout_toRightOf="@id/spar"
+            android:textSize="20sp"
+            android:text="N/A"
+            android:id="@+id/cond_txt"/>
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
+        android:id="@+id/info_layout"
         android:orientation="horizontal">
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:textSize="20sp"
+            android:text="N/A"
+            android:id="@+id/wind_info"/>
     </LinearLayout>
 
     <RelativeLayout
@@ -40,12 +83,10 @@
             weather:center_radius="100dp"
             weather:max_radius="400dp"
             weather:next_size="100dp">
-
-
         </com.example.jierui.canvas_path.DrawCenterPath>
 
 
     </RelativeLayout>
 
 
-</RelativeLayout>
+</LinearLayout>

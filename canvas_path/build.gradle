@@ -29,5 +29,4 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'junit:junit:4.12'
-    compile files('libs/okhttp-3.4.2.jar')
 }

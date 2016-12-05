@@ -8,17 +8,37 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import weatherHelper.Heweather5;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
-    DrawCenterPath drawCenterPath;
+    private DrawCenterPath drawCenterPath;
+    private TextView nowTmp;
+    private TextView cityTmp;
+    private TextView condTxt;
+    private TextView windInfo;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        nowTmp = (TextView) findViewById(R.id.now_tmp);
+        cityTmp = (TextView) findViewById(R.id.city_tmp);
+        condTxt = (TextView) findViewById(R.id.cond_txt);
+        windInfo = (TextView) findViewById(R.id.wind_info);
         drawCenterPath = (DrawCenterPath) findViewById(R.id.drawCenter);
+        drawCenterPath.setOnItemClickListener(new DrawCenterPath.OnItemClickListener() {
+            @Override
+            public void onClick(Heweather5 heweather5) {
+                Toast.makeText(MainActivity.this, heweather5.getCityName(), Toast.LENGTH_SHORT);
+                nowTmp.setText(heweather5.getNow().getTmp());
+                cityTmp.setText(heweather5.getCityName());
+                condTxt.setText(heweather5.getNow().getCondTxt());
+                windInfo.setText(heweather5.getNow().getWind().getSc());
+            }
+        });
         drawCenterPath.addCity("北京");
         drawCenterPath.addCity("上海");
         drawCenterPath.addCity("天津");
@@ -30,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
         drawCenterPath.addCity("新乡");
         drawCenterPath.addCity("郑州");
         drawCenterPath.addCity("呼和浩特");
-        drawCenterPath.addCity("巴音郭楞");
+        drawCenterPath.addCity("若羌");
         drawCenterPath.addCity("哈尔滨");
-        drawCenterPath.addCity("四川");
+        drawCenterPath.addCity("成都");
         drawCenterPath.addCity("开封");
         drawCenterPath.addCity("清丰");
 
@@ -84,4 +104,6 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(view);
 
     }
+
+
 }
