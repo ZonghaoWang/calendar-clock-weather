@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">canvas_path</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="aqi">空气质量指数</string>
+    <string name="co">一氧化碳浓度</string>
+    <string name="no2">二氧化氮浓度</string>
+    <string name="o3">臭氧浓度</string>
+    <string name="pm10">pm10</string>
+    <string name="pm25">主要污染物</string>
+    <string name="qlty">空气质量描述</string>
+    <string name="so2">二氧化硫浓度</string>
+    <string name="air_suggestion">空气指数</string>
+    <string name="comf_suggestion">舒适指数</string>
+    <string name="cw_suggestion">洗车指数</string>
+    <string name="drsg_suggestion">穿衣指数</string>
+    <string name="flu_suggestion">感冒指数</string>
+    <string name="sport_suggestion">运动指数</string>
+    <string name="trav_suggestion">旅游指数</string>
+    <string name="uv_suggestion">紫外线指数</string>
 </resources>

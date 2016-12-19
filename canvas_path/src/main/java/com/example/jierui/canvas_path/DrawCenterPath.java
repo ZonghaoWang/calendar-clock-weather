@@ -21,15 +21,23 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import toolbox.DateTimeCalender;
+import weatherHelper.Aqi;
+import weatherHelper.DailyForecast;
 import weatherHelper.Heweather5;
+import weatherHelper.HourForeCast;
+import weatherHelper.Suggestion;
 
 /**
  * Created by jierui on 2016/11/18.
@@ -66,6 +74,10 @@ public class DrawCenterPath extends View {
     // nextButton 参数，坐标
     private float centerNextButtonX;
     private float centerNextButtonY;
+
+    // 当前日期
+    private String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
+    private String time = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date(System.currentTimeMillis()));
 
 
 
@@ -301,7 +313,7 @@ public class DrawCenterPath extends View {
                 break;
             case aqi:
                 drawAqiPage(canvas);
-            
+
         }
 
         canvas.drawBitmap(mBgBitmap, null, new Rect((int)(centerNextButtonX - nextSize / 2), (int)(centerNextButtonY - nextSize / 2), (int)(centerNextButtonX + nextSize / 2), (int)(centerNextButtonY + nextSize / 2)), null);
@@ -309,71 +321,346 @@ public class DrawCenterPath extends View {
         super.onDraw(canvas);
     }
 
+
     private void drawAqiPage(Canvas canvas) {
-        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 120 + hourlySweepAngle, "aqiSweepAngle", (int) mainSize);
-        aqiAngleSet.add(new Limit(300));
+
+
+        Aqi aqi = currentHeweather5.getAqi();
+        if (aqi == null){
+            nextState();
+            requestLayout();
+            return;
+        }
+        List<String> indicators = new ArrayList<String>();
+        List<String> degrees = new ArrayList<String>();
+        if (aqi.getAqi()!=null){
+            indicators.add(getResources().getString(R.string.aqi));
+            degrees.add(aqi.getAqi());
+        }
+        if (aqi.getCo()!=null){
+            indicators.add(getResources().getString(R.string.co));
+            degrees.add(aqi.getCo());
+        }
+        if (aqi.getNo2()!=null){
+            indicators.add(getResources().getString(R.string.no2));
+            degrees.add(aqi.getNo2());
+        }
+        if (aqi.getO3()!=null){
+            indicators.add(getResources().getString(R.string.o3));
+            degrees.add(aqi.getO3());
+        }
+        if (aqi.getPm10()!=null){
+            indicators.add(getResources().getString(R.string.pm10));
+            degrees.add(aqi.getPm10());
+        }
+        if (aqi.getPm25()!=null){
+            indicators.add(getResources().getString(R.string.pm25));
+            degrees.add(aqi.getPm25());
+        }
+        if (aqi.getSo2()!=null){
+            indicators.add(getResources().getString(R.string.so2));
+            degrees.add(aqi.getSo2());
+        }
+
+        Paint circlePaint = new Paint();
+        circlePaint.setColor(Color.RED);
+        circlePaint.setStyle(Paint.Style.STROKE);
+        circlePaint.setStrokeWidth(4);
+        Paint mTextPaint = new Paint();
+        mTextPaint.setColor(Color.BLACK);
+        mTextPaint.setTextSize(numSize);
+        Paint nTextPaint = new Paint();
+        nTextPaint.setColor(Color.BLACK);
+        nTextPaint.setTextSize(numSize);
+
+
+
+
+        float circleRadius1 = phyMaxRadius - numSize - mTextPaint.getFontMetrics().descent;
+        float circleRadius2 = phyMaxRadius - (numSize + mTextPaint.getFontMetrics().descent) * 2;
+//        float circleRadius3 = phyMaxRadius - (numSize + mTextPaint.getFontMetrics().descent) * 3;
+
+        float textRadius1 = phyMaxRadius - numSize;
+        float textRadius2 = phyMaxRadius - 2 * numSize - mTextPaint.getFontMetrics().descent;
+//        float textRadius3 = phyMaxRadius - 3 * numSize - mTextPaint.getFontMetrics().descent * 2;
+
+        RectF rectf1 = new RectF(centerX - textRadius1, centerY - textRadius1, centerX + textRadius1, centerY + textRadius1);
+        RectF rectf2 = new RectF(centerX - textRadius2, centerY - textRadius2, centerX + textRadius2, centerY + textRadius2);
+//        RectF rectf3 = new RectF(centerX - textRadius3, centerY - textRadius3, centerX + textRadius3, centerY + textRadius3);
+        List<List<String>> strings = new ArrayList<List<String>>();
+        strings.add(indicators);
+        strings.add(degrees);
+        drawRepeatPage(canvas, aqiSweepAngle, aqiAngleSet, new float[]{phyMaxRadius, circleRadius1, circleRadius2}, new RectF[]{rectf1, rectf2}, new Paint[]{circlePaint, mTextPaint, mTextPaint}, strings, new boolean[]{false, false});
+
     }
 
     private void drawNowPage(Canvas canvas) {
-//        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 120 + nowSweepAngle, "北京", (int) mainSize);
-//        nowAngleSet.add(new Limit(60));
-//        cityName.clear();
-//        cityName.add("北京");
-//        cityName.add("上海");
-//        cityName.add("天津");
-//        cityName.add("重庆");
-//        cityName.add("乌鲁木齐");
-//        cityName.add("濮阳");
-//        cityName.add("邯郸");
-//        cityName.add("菏泽");
-//        cityName.add("新乡");
-//        cityName.add("郑州");
-//        cityName.add("呼和浩特");
-//        cityName.add("巴音郭楞");
-//        cityName.add("哈尔滨");
-//        cityName.add("纽约");
-//        float textRadius = phyMaxRadius - mainSize;
-//        RectF mRange = new RectF(centerX - textRadius, centerY - textRadius, centerX + textRadius, centerY + textRadius);
-//
-//        Paint mTextPaint = new Paint();
-//        mTextPaint.setColor(Color.BLACK);
-//        mTextPaint.setTextSize(mainSize);
-//        float eachAngle = cityName.size() >= 5? 60 : 300 / cityName.size();
-//        int i = 0;
-//        for (String str : cityName){
-//            if (120 + nowSweepAngle + eachAngle * (i + 0.5)>= VISIABLE_START_ANGLE && 120 + nowSweepAngle + eachAngle * (i + 0.5) <= VISIABLE_END_ANGLE){
-//                Path path = new Path();
-//                path.addArc(mRange, 120 + nowSweepAngle + eachAngle * i, eachAngle);
-//                float textWidth = mTextPaint.measureText(str);
-//                float hOffset = (float) (textRadius * Math.PI / 360 * eachAngle - textWidth / 2);// 水平偏移
-//                float vOffset = textRadius / 2 / 6;// 垂直偏移
-//                canvas.drawTextOnPath(str, path, hOffset, 0, mTextPaint);
-//            }
-//
-//            i += 1;
-//            nowAngleSet.add(new Limit(eachAngle * i));
-//        }
-
 
 
     }
     private void drawHourlyPage(Canvas canvas) {
-        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 120 + hourlySweepAngle, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())), (int) mainSize);
-        hourlyAngleSet.add(new Limit(300));
-    }
-    private void drawDailyPage(Canvas canvas) {
+        Date time = new Date(System.currentTimeMillis());
+        hourlyAngleSet.clear();
+        List<HourForeCast> hourForeCasts = currentHeweather5.getHourForeCast();
+        int timeIndex = 0;
+        long minTime = 24 * 3600 * 1000;
+        for (int i = 0; i < hourForeCasts.size(); i++) {
+            try {
+                Date forcastTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(hourForeCasts.get(i).getDate());
+                if (Math.abs(forcastTime.getTime() - time.getTime()) <= minTime){
+                    minTime = Math.abs(forcastTime.getTime() - time.getTime());
+                    timeIndex = i;
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        int len = hourForeCasts.size();
+
+        Paint circlePaint = new Paint();
+        circlePaint.setColor(Color.RED);
+        circlePaint.setStyle(Paint.Style.STROKE);
+        circlePaint.setStrokeWidth(4);
+        Paint mTextPaint = new Paint();
+        mTextPaint.setColor(Color.BLACK);
+        mTextPaint.setTextSize(numSize);
+        Paint nTextPaint = new Paint();
+        nTextPaint.setColor(Color.BLACK);
+        nTextPaint.setTextSize(numSize);
+
+        List<String> stringHourTime = new ArrayList<String>();
+        List<String> stringTmpTime = new ArrayList<String>();
+        List<String> stringWindSC = new ArrayList<String>();
+        for (int i = 0; i < hourForeCasts.size(); i++){
+            HourForeCast hourForeCast = hourForeCasts.get(i);
+            String hourTime;
+            String tmpTime;
+            String windSC;
+            hourTime = hourForeCast.getDate().substring(11);
+            tmpTime = hourForeCast.getCondTxt() + " " + hourForeCast.getTmp();
+            windSC = hourForeCast.getWind().getSc();
+            stringHourTime.add(hourTime);
+            stringTmpTime.add(tmpTime);
+            stringWindSC.add(windSC);
+        }
+        List<List<String>> strings = new ArrayList<List<String>>();
+        strings.add(stringHourTime);
+        strings.add(stringTmpTime);
+        strings.add(stringWindSC);
+
         try {
-            drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 120 + dailySweepAngle, new SimpleDateFormat("HH:mm").format(new SimpleDateFormat("yyyy-MM-dd HH/mm").parse("2016-12-01 20/51")), (int) mainSize);
+            if (stringHourTime.size()!=0) {
+                if (Math.abs(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(hourForeCasts.get(timeIndex).getDate()).getTime() - time.getTime()) <= 0.5 * 3600 * 1000) {
+                    stringHourTime.set(timeIndex, "现在");
+                }
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        dailyAngleSet.add(new Limit(300));
+
+        float circleRadius1 = phyMaxRadius - numSize - mTextPaint.getFontMetrics().descent;
+        float circleRadius2 = phyMaxRadius - (numSize + mTextPaint.getFontMetrics().descent) * 2;
+        float circleRadius3 = phyMaxRadius - (numSize + mTextPaint.getFontMetrics().descent) * 3;
+
+        float textRadius1 = phyMaxRadius - numSize;
+        float textRadius2 = phyMaxRadius - 2 * numSize - mTextPaint.getFontMetrics().descent;
+        float textRadius3 = phyMaxRadius - 3 * numSize - mTextPaint.getFontMetrics().descent * 2;
+
+        RectF rectf1 = new RectF(centerX - textRadius1, centerY - textRadius1, centerX + textRadius1, centerY + textRadius1);
+        RectF rectf2 = new RectF(centerX - textRadius2, centerY - textRadius2, centerX + textRadius2, centerY + textRadius2);
+        RectF rectf3 = new RectF(centerX - textRadius3, centerY - textRadius3, centerX + textRadius3, centerY + textRadius3);
+
+        drawRepeatPage(canvas, hourlySweepAngle, hourlyAngleSet, new float[]{phyMaxRadius, circleRadius1, circleRadius2, circleRadius3}, new RectF[]{rectf1, rectf2, rectf3}, new Paint[]{circlePaint, mTextPaint, mTextPaint, mTextPaint}, strings, new boolean[]{false, true, false});
+
+        if (hourlyPagePressed){
+            int index = calculateIndexZone(hourlySweepAngle, hourlyAngleSet);
+            if (index!=-1){
+                HourForeCast hourForeCast = hourForeCasts.get(index);
+            }
+        }
     }
+    private void drawDailyPage(Canvas canvas) {
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
+        dailyAngleSet.clear();
+        List<DailyForecast> dailyForecasts = currentHeweather5.getDailyForecast();
+        int dateIndex = 0;
+        for (int i = 0; i < dailyForecasts.size(); i++) {
+            if (dailyForecasts.get(i).getDate().equals(date)) {
+                dateIndex = i;
+                break;
+            }
+        }
+
+            int len = dailyForecasts.size();
+
+
+
+            Paint circlePaint = new Paint();
+            circlePaint.setColor(Color.RED);
+            circlePaint.setStyle(Paint.Style.STROKE);
+            circlePaint.setStrokeWidth(4);
+            Paint mTextPaint = new Paint();
+            mTextPaint.setColor(Color.BLACK);
+            mTextPaint.setTextSize(numSize);
+            Paint nTextPaint = new Paint();
+            nTextPaint.setColor(Color.BLACK);
+            nTextPaint.setTextSize(numSize);
+
+
+
+        List<String> stringCalender = new ArrayList<String>();
+        List<String> stringDayCond = new ArrayList<String>();
+        List<String> stringNightCond = new ArrayList<String>();
+        for (int i = 0; i < dailyForecasts.size(); i++){
+            DailyForecast dailyForecast = dailyForecasts.get(i);
+            String calender;
+            String dayCond;
+            String nightCond;
+             try {
+                calender = DateTimeCalender.getWeekOfDate(new SimpleDateFormat("yyyy-MM-dd").parse(dailyForecast.getDate()));
+                dayCond = dailyForecast.getCond().getTxt_d() + " " + dailyForecast.getTmp().getMax();
+                nightCond = dailyForecast.getCond().getTxt_n() + " " + dailyForecast.getTmp().getMin();
+                stringDayCond.add(dayCond);
+                stringNightCond.add(nightCond);
+                stringCalender.add(calender);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        List<List<String>> strings = new ArrayList<List<String>>();
+        strings.add(stringCalender);
+        strings.add(stringDayCond);
+        strings.add(stringNightCond);
+        // 确定昨天今天明天和周几
+        for (int i = 0; i < dailyForecasts.size(); i++){
+            if (i == dateIndex){
+                stringCalender.set(i, "今天");
+            }
+            if (i == dateIndex - 1){
+                stringCalender.set(i, "昨天");
+            }
+            if (i == dateIndex + 1){
+                stringCalender.set(i, "明天");
+            }
+        }
+        // 内圈文字半径， mrange main文字的半径, nrange 温度天气的半径
+        // 包围文字的两个圆
+        float circleRadius1 = phyMaxRadius - numSize - mTextPaint.getFontMetrics().descent;
+        float circleRadius2 = phyMaxRadius - (numSize + mTextPaint.getFontMetrics().descent) * 2;
+        float circleRadius3 = phyMaxRadius - (numSize + mTextPaint.getFontMetrics().descent) * 3;
+
+        float textRadius1 = phyMaxRadius - numSize;
+        float textRadius2 = phyMaxRadius - 2 * numSize - mTextPaint.getFontMetrics().descent;
+        float textRadius3 = phyMaxRadius - 3 * numSize - mTextPaint.getFontMetrics().descent * 2;
+
+        RectF rectf1 = new RectF(centerX - textRadius1, centerY - textRadius1, centerX + textRadius1, centerY + textRadius1);
+        RectF rectf2 = new RectF(centerX - textRadius2, centerY - textRadius2, centerX + textRadius2, centerY + textRadius2);
+        RectF rectf3 = new RectF(centerX - textRadius3, centerY - textRadius3, centerX + textRadius3, centerY + textRadius3);
+
+        drawRepeatPage(canvas, dailySweepAngle, dailyAngleSet, new float[]{phyMaxRadius, circleRadius1, circleRadius2, circleRadius3}, new RectF[]{rectf1, rectf2, rectf3}, new Paint[]{circlePaint, mTextPaint, mTextPaint, mTextPaint}, strings, new boolean[]{false, true, true});
+
+        if (dailyPagePressed){
+            int index = calculateIndexZone(dailySweepAngle, dailyAngleSet);
+            if (index!=-1){
+                DailyForecast dailyForecast = dailyForecasts.get(index);
+            }
+        }
+    }
+
+
+
+
     private void drawSuggestionPage(Canvas canvas) {
-        drawRotateText(canvas, centerX, centerY, phyMaxRadius - mainSize, 120 + suggestionSweepAngle, "suggestionSweepAngle", (int) mainSize);
-        suggestionAngleSet.add(new Limit(300));;
+        Suggestion suggestion = currentHeweather5.getSuggestion();
+        if (suggestion == null){
+            nextState();
+            requestLayout();
+            return;
+        }
+        List<String> indicators = new ArrayList<String>();
+        List<String> brf = new ArrayList<String>();
+        List<String> txt = new ArrayList<String>();
+        if (suggestion.getAirBrf()!= null){
+            indicators.add(getResources().getString(R.string.air_suggestion));
+            brf.add(suggestion.getAirBrf());
+            txt.add(suggestion.getAirTxt());
+        }
+        if (suggestion.getComfBrf()!= null){
+            indicators.add(getResources().getString(R.string.comf_suggestion));
+            brf.add(suggestion.getComfBrf());
+            txt.add(suggestion.getComfTxt());
+        }
+        if (suggestion.getCwBrf()!= null){
+            indicators.add(getResources().getString(R.string.cw_suggestion));
+            brf.add(suggestion.getCwBrf());
+            txt.add(suggestion.getCwTxt());
+        }
+        if (suggestion.getDrsgBrf()!= null){
+            indicators.add(getResources().getString(R.string.drsg_suggestion));
+            brf.add(suggestion.getDrsgBrf());
+            txt.add(suggestion.getDrsgTxt());
+        }
+        if (suggestion.getFluBrf()!= null){
+            indicators.add(getResources().getString(R.string.flu_suggestion));
+            brf.add(suggestion.getFluBrf());
+            txt.add(suggestion.getFluTxt());
+        }
+        if (suggestion.getSportBrf()!= null){
+            indicators.add(getResources().getString(R.string.sport_suggestion));
+            brf.add(suggestion.getSportBrf());
+            txt.add(suggestion.getSportTxt());
+        }
+        if (suggestion.getTravBrf()!= null){
+            indicators.add(getResources().getString(R.string.trav_suggestion));
+            brf.add(suggestion.getTravBrf());
+            txt.add(suggestion.getTravTxt());
+        }
+        if (suggestion.getUvBrf()!= null){
+            indicators.add(getResources().getString(R.string.uv_suggestion));
+            brf.add(suggestion.getUvBrf());
+            txt.add(suggestion.getUvTxt());
+        }
+
+
+        Paint circlePaint = new Paint();
+        circlePaint.setColor(Color.RED);
+        circlePaint.setStyle(Paint.Style.STROKE);
+        circlePaint.setStrokeWidth(4);
+        Paint mTextPaint = new Paint();
+        mTextPaint.setColor(Color.BLACK);
+        mTextPaint.setTextSize(numSize);
+        Paint nTextPaint = new Paint();
+        nTextPaint.setColor(Color.BLACK);
+        nTextPaint.setTextSize(numSize);
+
+
+
+
+        float circleRadius1 = phyMaxRadius - numSize - mTextPaint.getFontMetrics().descent;
+        float circleRadius2 = phyMaxRadius - (numSize + mTextPaint.getFontMetrics().descent) * 2;
+//        float circleRadius3 = phyMaxRadius - (numSize + mTextPaint.getFontMetrics().descent) * 3;
+
+        float textRadius1 = phyMaxRadius - numSize;
+        float textRadius2 = phyMaxRadius - 2 * numSize - mTextPaint.getFontMetrics().descent;
+//        float textRadius3 = phyMaxRadius - 3 * numSize - mTextPaint.getFontMetrics().descent * 2;
+
+        RectF rectf1 = new RectF(centerX - textRadius1, centerY - textRadius1, centerX + textRadius1, centerY + textRadius1);
+        RectF rectf2 = new RectF(centerX - textRadius2, centerY - textRadius2, centerX + textRadius2, centerY + textRadius2);
+//        RectF rectf3 = new RectF(centerX - textRadius3, centerY - textRadius3, centerX + textRadius3, centerY + textRadius3);
+        List<List<String>> strings = new ArrayList<List<String>>();
+        strings.add(indicators);
+        strings.add(brf);
+        drawRepeatPage(canvas, suggestionSweepAngle, suggestionAngleSet, new float[]{phyMaxRadius, circleRadius1, circleRadius2}, new RectF[]{rectf1, rectf2}, new Paint[]{circlePaint, mTextPaint, mTextPaint}, strings, new boolean[]{false, false});
+
+        if (suggestionPagePressed){
+            int index = calculateIndexZone(suggestionSweepAngle, suggestionAngleSet);
+            if (index!=-1){
+                String str = txt.get(index);
+            }
+        }
     }
     private void drawCityPage(Canvas canvas) {
+        cityAngleSet.clear();
         float textRadius = phyMaxRadius - mainSize;
 
 
@@ -433,8 +720,69 @@ public class DrawCenterPath extends View {
 //
 //            }
         }
+        if (cityPagePressed){
+            int index = calculateIndexZone(citySweepAngle, cityAngleSet);
+            if (index!=-1){
+
+            }
+        }
     }
 
+    /**\
+     * Canvas canvas 画布
+     * float sweepAngle 该page的拖动角度
+     * List<Limit> angleSet 边界值
+     * float[] radiuses 圆的半径
+     * Paint[] paintses 画笔，第一个画笔是圆画笔，之后的画笔是字体的画笔
+     * List<List<String>> strings 每一圈的文本
+     */
+
+    private void drawRepeatPage(Canvas canvas, float sweepAngle, List<Limit> angleSet, float[] radiuses, RectF[] rectFs, Paint[] paintses, List<List<String>> strings, boolean[] booleens) {
+//        float innerRadius = textRadius - mTextPaint.getFontMetrics().descent - numSize;
+//
+//        RectF mRange = new RectF(centerX - textRadius, centerY - textRadius, centerX + textRadius, centerY + textRadius);
+//        RectF nRange = new RectF(centerX - innerRadius, centerY - innerRadius, centerX + innerRadius, centerY + innerRadius);
+
+        if (paintses!=null) {
+            for (int i = 0; i < radiuses.length; i++) {
+                canvas.drawCircle(centerX, centerY, radiuses[i], paintses[0]);
+            }
+        }
+        float eachAngle;
+        if (strings.get(0).size()==0){
+            eachAngle = 300;
+        }else {
+             eachAngle = strings.get(0).size() >= 5 ? 60 : 300 / strings.get(0).size();
+        }
+        for (int i = 0; i < strings.size(); i++){
+            boolean ob = booleens[i];
+            List<String> string = strings.get(i);
+            Paint paint = paintses[i + 1];
+            RectF rectF = rectFs[i];
+            float radius = rectF.width()/2;
+            for (int j = 0; j < string.size(); j++) {
+                if (120 + sweepAngle + eachAngle * (j + 0.5) >= VISIABLE_START_ANGLE && 120 + sweepAngle + eachAngle * (j + 0.5) <= VISIABLE_END_ANGLE) {
+
+                    Path path = new Path();
+                    path.addArc(rectF, 120 + sweepAngle + eachAngle * j, eachAngle);
+                    float textWidth = paint.measureText(string.get(j));
+                    float hOffset = (float) (radius * Math.PI / 360 * eachAngle - textWidth / 2);// 水平偏移
+                    canvas.drawTextOnPath(string.get(j), path, hOffset, 0, paint);
+                    if (ob){
+                        Paint p = new Paint();
+                        p.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 8, getResources().getDisplayMetrics()));
+                        canvas.drawTextOnPath("o", path, hOffset + textWidth, paint.getFontMetrics().ascent + p.getTextSize(), p);
+                    }
+                }
+                if (i == 0) {
+                    angleSet.add(new Limit(eachAngle * (j + 1)));
+                }
+            }
+
+        }
+
+
+    }
     private float mLastX;
     private float mLastY;
     private float clickedX;
@@ -455,6 +803,13 @@ public class DrawCenterPath extends View {
     private boolean isNextButtonPressed = false;
     // 点击是否在小圆内
     private boolean isInCenterRadius = false;
+    // 各个page页面是否被点击
+    private boolean cityPagePressed = false;
+    private boolean dailyPagePressed = false;
+    private boolean hourlyPagePressed = false;
+    private boolean suggestionPagePressed = false;
+    private boolean aqiPagePressed = false;
+    private boolean nowPagePressed = false;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -513,7 +868,12 @@ public class DrawCenterPath extends View {
                             nowSweepAngle += comAngle(nowSweepAngle, addedAngle, 30f, 270 - nowAngleSet.get(nowAngleSet.size() - 1).getBoud());
                             break;
                         case hourly:
-                            hourlySweepAngle += comAngle(hourlySweepAngle, addedAngle, 30f, 270 - hourlyAngleSet.get(hourlyAngleSet.size() - 1).getBoud());
+                            if (hourlyAngleSet.size()!=0) {
+                                hourlySweepAngle += comAngle(hourlySweepAngle, addedAngle, 30f, 270 - hourlyAngleSet.get(hourlyAngleSet.size() - 1).getBoud());
+                            }else{
+                                hourlySweepAngle += comAngle(hourlySweepAngle, addedAngle, 30f, 270 - 0);
+
+                            }
                             break;
                         case daily:
                             dailySweepAngle += comAngle(dailySweepAngle, addedAngle, 30f, 270 - dailyAngleSet.get(dailyAngleSet.size() - 1).getBoud());
@@ -559,40 +919,49 @@ public class DrawCenterPath extends View {
                     if (Math.abs(mTmpAngle) < NOCLICK_VALUE) {  // 点击事件
                         clickedX = event.getX();
                         clickedY = event.getY();
-                        clickedAngle = getAngle(clickedX, clickedY);
-                        switch (currentPage){
-                            case now:
-                                break;
-                            case hourly:
-                                break;
-                            case daily:
-                                break;
-                            case suggestion:
-                                break;
-                            case city:
-                                clickedAngle = clickedAngle <= 90? 360 + clickedAngle : clickedAngle;
+                        if (inInstristZone(clickedX, clickedY, phyMaxRadius, centerRadius)) {
+                            clickedAngle = getAngle(clickedX, clickedY);
+                            clickedAngle = clickedAngle <= 90 ? 360 + clickedAngle : clickedAngle;
+                            switch (currentPage) {
+                                case now:
+                                    nowPagePressed = !nowPagePressed;
+                                    break;
+                                case hourly:
+                                    hourlyPagePressed = !hourlyPagePressed;
+                                    break;
+                                case daily:
+                                    dailyPagePressed = !dailyPagePressed;
+                                    break;
+                                case suggestion:
+                                    suggestionPagePressed = !suggestionPagePressed;
+                                    break;
+                                case city:
+                                    cityPagePressed = !cityPagePressed;
 
-                                float siteAngle = clickedAngle - citySweepAngle - STARTANGLE;
-                                int cityNameIndex = 0;
-                                for (int i = 0; i < cityAngleSet.size(); i++){
-                                    if (siteAngle < cityAngleSet.get(i).getBoud()){
-                                        cityNameIndex = i;
-                                        break;
+                                    float siteAngle = clickedAngle - citySweepAngle - STARTANGLE;
+                                    int cityNameIndex = 0;
+                                    for (int i = 0; i < cityAngleSet.size(); i++) {
+                                        if (siteAngle < cityAngleSet.get(i).getBoud()) {
+                                            cityNameIndex = i;
+                                            currentCity = cityName.get(i);
+                                            break;
+                                        }
                                     }
-                                }
-                                for (int i = 0; i < weatherInfoList.size(); i++){
-                                    if (weatherInfoList.get(i).getCityName().equals(cityName.get(cityNameIndex))){
-                                        mItemClickListener.onClick(weatherInfoList.get(i));
-                                        break;
+                                    for (int i = 0; i < weatherInfoList.size(); i++) {
+                                        if (weatherInfoList.get(i).getCityName().equals(cityName.get(cityNameIndex))) {
+                                            currentHeweather5 = weatherInfoList.get(i);
+                                            mItemClickListener.onClick(currentHeweather5);
+                                            break;
+                                        }
                                     }
-                                }
 
-                                break;
-                            case aqi:
-                                break;
-                        }
+                                    break;
+                                case aqi:
+                                    break;
+                            }
 //
-                        requestLayout();
+                            requestLayout();
+                        }
                     }
                     return true;
 
@@ -600,6 +969,21 @@ public class DrawCenterPath extends View {
                 default:
                     return false;
         }
+    }
+
+    private int calculateIndexZone(float sweepAngle, List<Limit> limits){
+        float siteAngle = clickedAngle - sweepAngle - STARTANGLE;
+        int cityNameIndex = -1;
+        for (int i = 0; i < limits.size(); i++) {
+            if (siteAngle < limits.get(i).getBoud()) {
+                cityNameIndex = i;
+                return cityNameIndex;
+            }
+        }
+        return cityNameIndex;
+    }
+    private boolean inInstristZone(float cliX, float cliY, float maxR, float minR) {
+        return (Math.hypot(cliX - centerX, cliY - centerY) <= maxR) && (Math.hypot(cliX - centerX, cliY - centerY) >= minR);
     }
 
     private float comAngle(float nowAngle, float addedAngle, float maxValue, float minValue) {

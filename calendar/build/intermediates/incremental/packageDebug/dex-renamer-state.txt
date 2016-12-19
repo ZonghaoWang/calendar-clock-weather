@@ -1,0 +1,7 @@
+#Mon Dec 19 21:45:49 CST 2016
+base.0=C\:\\Users\\jierui\\Desktop\\test\\calendar\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_d4a6a21bc5b255e4a26b055b17f55cd389006c6b
+renamed.1=classes2.dex
+renamed.0=classes.dex
+file.1=C\:\\Users\\jierui\\Desktop\\test\\calendar\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_c5b9e89bf8c53db074f87eca0664e94efbd7a092\\classes.dex
+base.1=C\:\\Users\\jierui\\Desktop\\test\\calendar\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_c5b9e89bf8c53db074f87eca0664e94efbd7a092
+file.0=C\:\\Users\\jierui\\Desktop\\test\\calendar\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_d4a6a21bc5b255e4a26b055b17f55cd389006c6b\\classes.dex

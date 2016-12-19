@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/animation/animation.iml" filepath="$PROJECT_DIR$/animation/animation.iml" />
       <module fileurl="file://$PROJECT_DIR$/animator/animator.iml" filepath="$PROJECT_DIR$/animator/animator.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/calendar/calendar.iml" filepath="$PROJECT_DIR$/calendar/calendar.iml" />
       <module fileurl="file://$PROJECT_DIR$/canvas_path/canvas_path.iml" filepath="$PROJECT_DIR$/canvas_path/canvas_path.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/satilate_menu/satilate_menu.iml" filepath="$PROJECT_DIR$/satilate_menu/satilate_menu.iml" />

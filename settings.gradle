@@ -1,1 +1,2 @@
 include ':app', ':canvas_path', ':library', ':toolbar', ':animation', ':animator', ':satilate_menu'
+include ':calendar'

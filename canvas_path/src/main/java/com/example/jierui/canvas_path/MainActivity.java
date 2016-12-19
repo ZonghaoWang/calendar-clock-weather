@@ -1,16 +1,16 @@
 package com.example.jierui.canvas_path;
 
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import toolbox.BasicTools;
 import weatherHelper.Heweather5;
 
 public class MainActivity extends AppCompatActivity{
@@ -19,7 +19,22 @@ public class MainActivity extends AppCompatActivity{
     private TextView nowTmp;
     private TextView cityTmp;
     private TextView condTxt;
-    private TextView windInfo;
+    private LinearLayout windInfo;
+    private LinearLayout humInfo;
+    private LinearLayout aqiInfo;
+    private LinearLayout visInfo;
+    private LinearLayout head;
+
+    private TextView wind_txt;
+    private TextView wind_degree;
+    private TextView hum_degree;
+    private TextView aqi_txt;
+    private TextView aqi_degree;
+    private TextView vis_degree;
+    private TextView spector1;
+    private TextView spector2;
+    private TextView spector3;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,16 +42,44 @@ public class MainActivity extends AppCompatActivity{
         nowTmp = (TextView) findViewById(R.id.now_tmp);
         cityTmp = (TextView) findViewById(R.id.city_tmp);
         condTxt = (TextView) findViewById(R.id.cond_txt);
-        windInfo = (TextView) findViewById(R.id.wind_info);
+        windInfo = (LinearLayout) findViewById(R.id.wind_info);
+        humInfo = (LinearLayout) findViewById(R.id.hum_info);
+        aqiInfo = (LinearLayout) findViewById(R.id.aqi_info);
+        visInfo = (LinearLayout) findViewById(R.id.vis_info);
+        head = (LinearLayout) findViewById(R.id.head);
+
+        wind_txt = (TextView) findViewById(R.id.wind_txt);
+        wind_degree = (TextView) findViewById(R.id.wind_degree);
+        hum_degree = (TextView) findViewById(R.id.hum_degree);
+        aqi_txt = (TextView) findViewById(R.id.aqi_txt);
+        aqi_degree = (TextView) findViewById(R.id.aqi_degree);
+        vis_degree = (TextView) findViewById(R.id.vis_degree);
+        spector1 = (TextView) findViewById(R.id.spector1);
+        spector2 = (TextView) findViewById(R.id.spector2);
+        spector3 = (TextView) findViewById(R.id.spector3);
+
         drawCenterPath = (DrawCenterPath) findViewById(R.id.drawCenter);
         drawCenterPath.setOnItemClickListener(new DrawCenterPath.OnItemClickListener() {
             @Override
             public void onClick(Heweather5 heweather5) {
                 Toast.makeText(MainActivity.this, heweather5.getCityName(), Toast.LENGTH_SHORT);
+                head.setVisibility(View.VISIBLE);
                 nowTmp.setText(heweather5.getNow().getTmp());
                 cityTmp.setText(heweather5.getCityName());
                 condTxt.setText(heweather5.getNow().getCondTxt());
-                windInfo.setText(heweather5.getNow().getWind().getSc());
+                if (heweather5.getAqi()==null){
+                    spector2.setVisibility(View.GONE);
+                    aqiInfo.setVisibility(View.GONE);
+                }else {
+                    spector2.setVisibility(View.VISIBLE);
+                    aqiInfo.setVisibility(View.VISIBLE);
+                    aqi_txt.setText(heweather5.getAqi().getQlty());
+                    aqi_degree.setText(heweather5.getAqi().getPm25());
+                }
+                wind_txt.setText(heweather5.getNow().getWind().getDir());
+                wind_degree.setText(heweather5.getNow().getWind().getSc() + (BasicTools.hasDigit(heweather5.getNow().getWind().getSc())? " 级" : ""));
+                hum_degree.setText(heweather5.getNow().getHum()+ "%");
+                vis_degree.setText(heweather5.getNow().getVis() + " Km");
             }
         });
         drawCenterPath.addCity("北京");
@@ -104,6 +147,7 @@ public class MainActivity extends AppCompatActivity{
         layout.addView(view);
 
     }
+
 
 
 }

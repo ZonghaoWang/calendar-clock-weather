@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "C:\\Users\\jierui\\Desktop\\test\\calendar\\build\\intermediates\\res\\merged\\debug\\layout\\calendar_item.xml",
+        "source": "C:\\Users\\jierui\\Desktop\\test\\calendar\\src\\main\\res\\layout\\calendar_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\jierui\\Desktop\\test\\calendar\\build\\intermediates\\res\\merged\\debug\\layout\\calendar_gridview.xml",
+        "source": "C:\\Users\\jierui\\Desktop\\test\\calendar\\src\\main\\res\\layout\\calendar_gridview.xml"
+    },
+    {
+        "merged": "C:\\Users\\jierui\\Desktop\\test\\calendar\\build\\intermediates\\res\\merged\\debug\\layout\\calendar.xml",
+        "source": "C:\\Users\\jierui\\Desktop\\test\\calendar\\src\\main\\res\\layout\\calendar.xml"
+    }
+]

@@ -5,6 +5,12 @@
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.example.jierui.canvas_path.MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:id="@+id/head"
+        android:orientation="vertical">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
@@ -52,19 +58,117 @@
             android:text="N/A"
             android:id="@+id/cond_txt"/>
     </RelativeLayout>
+
+
+
+    <!--风力 适度 aqi 能见度-->
     <LinearLayout
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:id="@+id/info_layout"
         android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="25dp"
-            android:textSize="20sp"
-            android:text="N/A"
-            android:id="@+id/wind_info"/>
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/wind_info"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:id="@+id/wind_txt"
+                android:gravity="center"
+                android:textSize="@dimen/info_txt"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:id="@+id/wind_degree"
+                android:gravity="center"
+                android:textSize="@dimen/info_degree"/>
 
+        </LinearLayout>
+        <TextView
+            android:layout_width="@dimen/spector_width"
+            android:layout_height="@dimen/spector"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/spector1"
+            android:background="@color/spector"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/hum_info"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:gravity="center"
+                android:text="相对湿度"
+                android:textSize="@dimen/info_txt"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:id="@+id/hum_degree"
+                android:gravity="center"
+                android:textSize="@dimen/info_degree"/>
+        </LinearLayout>
+        <TextView
+            android:layout_width="@dimen/spector_width"
+            android:layout_height="@dimen/spector"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/spector2"
+            android:background="@color/spector"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/aqi_info"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:gravity="center"
+                android:id="@+id/aqi_txt"
+                android:textSize="@dimen/info_txt"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:id="@+id/aqi_degree"
+                android:gravity="center"
+                android:textSize="@dimen/info_degree"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="@dimen/spector_width"
+            android:layout_height="@dimen/spector"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/spector3"
+            android:background="@color/spector"/>
+
+            <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/vis_info"
+            android:orientation="vertical"
+            android:layout_weight="1">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:gravity="center"
+                    android:text="能见度"
+                    android:textSize="@dimen/info_txt"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:id="@+id/vis_degree"
+                    android:gravity="center"
+                    android:textSize="@dimen/info_degree"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
