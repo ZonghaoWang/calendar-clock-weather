@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LevelListDrawable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
@@ -19,6 +20,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.example.jierui.canvas_path.R;
+
+import db.DegreeLevelDB;
+import model.DegreeLevel;
+
+import static java.security.AccessController.getContext;
 
 /**
  * 日历gridview中的每一个item显示的textview
@@ -58,6 +64,14 @@ public class CalendarAdapter extends BaseAdapter {
 	private String sys_month = "";
 	private String sys_day = "";
 
+	// 是否显示日志等级
+	private boolean showOtherDayDegree = true;
+	private boolean showTodayDegree = true;
+
+
+	private int[] daysDegree = new int[42];
+	private DegreeLevelDB degreeLevelDB;
+	private DegreeLevel degreeLevel;
 	public CalendarAdapter() {
 		Date date = new Date();
 		sysDate = sdf.format(date); // 当期日期
@@ -70,6 +84,8 @@ public class CalendarAdapter extends BaseAdapter {
 	public CalendarAdapter(Context context, Resources rs, int jumpMonth, int jumpYear, int year_c, int month_c, int day_c) {
 		this();
 		this.context = context;
+		// 初始化degree
+		degreeLevelDB = DegreeLevelDB.getInstance(context);
 		sc = new SpecialCalendar();
 		lc = new LunarCalendar();
 		this.res = rs;
@@ -100,7 +116,10 @@ public class CalendarAdapter extends BaseAdapter {
 		currentDay = String.valueOf(day_c); // 得到当前日期是哪天
 
 		getCalendar(Integer.parseInt(currentYear), Integer.parseInt(currentMonth));
-
+		degreeLevel = degreeLevelDB.loadDegreeLevel(stepYear, stepMonth);
+		if (degreeLevel!=null) {
+			daysDegree = degreeLevel.getDegree();
+		}
 	}
 
 	public CalendarAdapter(Context context, Resources rs, int year, int month, int day) {
@@ -155,24 +174,40 @@ public class CalendarAdapter extends BaseAdapter {
 		textView.setTextColor(Color.GRAY);
 
 		if (position < daysOfMonth + dayOfWeek && position >= dayOfWeek) {
+			if (showOtherDayDegree){
+				drawable = res.getDrawable(R.drawable.degree_bg);
+				drawable.setLevel(daysDegree[position]);
+				textView.setBackground(drawable);
+			}
 			// 当前月信息显示
 			textView.setTextColor(Color.BLACK);// 当月字体设黑
+
 //			drawable = res.getDrawable(R.drawable.calendar_item_selected_bg);
-			drawable = new ColorDrawable(Color.rgb(23, 126, 214));
+//			drawable = new ColorDrawable(Color.rgb(23, 126, 214));
 			if (position % 7 == 0 || position % 7 == 6) {
 				// 当前月信息显示
 				textView.setTextColor(Color.rgb(23, 126, 214));// 当月字体设黑
 //				drawable = res.getDrawable(R.drawable.calendar_item_selected_bg);
-				drawable = new ColorDrawable(Color.rgb(23, 126, 214));
+//				drawable = new ColorDrawable(Color.rgb(23, 126, 214));
 			}
 		}
 
 		if (currentFlag == position) {
 			// 设置当天的背景
 //			drawable = res.getDrawable(R.drawable.calendar_item_selected_bg);
-			drawable = new ColorDrawable(Color.rgb(23, 126, 214));
-			textView.setBackgroundDrawable(drawable);
-			textView.setTextColor(Color.WHITE);
+//			drawable = new ColorDrawable(Color.rgb(23, 126, 214));
+//			textView.setBackgroundDrawable(drawable);
+//			LevelListDrawable lldrawable = (LevelListDrawable) res.getDrawable(R.drawable.other_day_bg);
+//			lldrawable.setLevel(1);
+			if (showTodayDegree){
+				drawable = res.getDrawable(R.drawable.today_bg);
+				drawable.setLevel(daysDegree[position]);
+				textView.setBackground(drawable);
+			}
+			textView.setTextColor(Color.BLACK);
+		}
+		if (position == 41){
+			degreeLevelDB.saveDegreeLevel(Integer.valueOf(currentYear), Integer.valueOf(currentMonth), daysDegree);
 		}
 		return convertView;
 	}
@@ -237,7 +272,9 @@ public class CalendarAdapter extends BaseAdapter {
 	public void matchScheduleDate(int year, int month, int day) {
 
 	}
-
+	public String getDateFromPosition(int i) {
+		return currentYear + "." + currentMonth + "." + (i - dayOfWeek + 1);
+	}
 	/**
 	 * 点击每一个item时返回item中的日期
 	 * 
@@ -304,5 +341,13 @@ public class CalendarAdapter extends BaseAdapter {
 
 	public void setCyclical(String cyclical) {
 		this.cyclical = cyclical;
+	}
+
+	public int[] getDaysDegree() {
+		return daysDegree;
+	}
+
+	public void setDaysDegree(int position, int value) {
+		this.daysDegree[position] = value;
 	}
 }

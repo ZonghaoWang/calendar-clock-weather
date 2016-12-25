@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="spector"> #303F9F</color>
+    <color name="none">#00FFFFFF</color>
+
     <!--  -->
     <color name="msg_emote_divider">#ffa1a1a1</color>
     <!-- menudraw -->

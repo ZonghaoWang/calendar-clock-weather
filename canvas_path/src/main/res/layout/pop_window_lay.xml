@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:clickable="true">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/degree_layout"
+        android:textSize="@dimen/degree_text_size"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/pop_window_bg"
+        android:gravity="center"
+        android:id="@+id/degree_calendar"/>
+    <LinearLayout
+        android:clickable="true"
+        android:focusable="true"
+        android:id="@+id/degree0"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/degree_layout">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/pop_window_bg"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:background="@drawable/pop_window_bg"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/degree0"
+            android:textSize="@dimen/degree_text_size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/degree1"
+        android:layout_width="match_parent"
+        android:background="@drawable/pop_window_bg"
+        android:layout_height="@dimen/degree_layout">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/degree1"
+            android:textSize="@dimen/degree_text_size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/degree2"
+        android:layout_width="match_parent"
+        android:background="@drawable/pop_window_bg"
+        android:layout_height="@dimen/degree_layout">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/degree2"
+            android:textSize="@dimen/degree_text_size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/degree3"
+        android:layout_width="match_parent"
+        android:background="@drawable/pop_window_bg"
+        android:layout_height="@dimen/degree_layout">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/degree3"
+            android:textSize="@dimen/degree_text_size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/degree4"
+        android:layout_width="match_parent"
+        android:background="@drawable/pop_window_bg"
+        android:layout_height="@dimen/degree_layout">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/degree4"
+            android:textSize="@dimen/degree_text_size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/degree5"
+        android:layout_width="match_parent"
+        android:background="@drawable/pop_window_bg"
+        android:layout_height="@dimen/degree_layout">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/degree5"
+            android:textSize="@dimen/degree_text_size" />
+    </LinearLayout>
+</LinearLayout>

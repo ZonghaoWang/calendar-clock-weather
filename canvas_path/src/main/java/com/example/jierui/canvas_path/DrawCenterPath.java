@@ -175,6 +175,11 @@ public class DrawCenterPath extends View {
         this.setFocusable(true);
         setClickable(true);
         if (attrs != null) {
+            /**
+             * TypedArray得到attrs下的某个view的所有属性
+             * attr 从父view传过来的属性值，switch一下获得属性的px值，没有的选择默认值
+             */
+
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DrawCenterPath);
             int n = a.getIndexCount();
             for (int i = 0; i < n; i++){

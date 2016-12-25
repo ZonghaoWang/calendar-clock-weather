@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_launcher" android:maxLevel="100"/>
+    <item android:drawable="@drawable/btn_bg_normal" android:maxLevel="200"/>
+    <item android:drawable="@drawable/mark" android:maxLevel="300"/>
+
+</level-list>

@@ -6,4 +6,7 @@
     <dimen name="spector_width">2px</dimen>
     <dimen name="info_txt">20sp</dimen>
     <dimen name="info_degree">30sp</dimen>
+    <dimen name="degree_layout">25dp</dimen>
+    <dimen name="degree_text_size">20sp</dimen>
+
 </resources>

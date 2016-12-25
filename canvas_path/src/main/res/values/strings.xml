@@ -17,4 +17,11 @@
     <string name="sport_suggestion">运动指数</string>
     <string name="trav_suggestion">旅游指数</string>
     <string name="uv_suggestion">紫外线指数</string>
+    <string name="degree0">空缺</string>
+    <string name="degree1">完美</string>
+    <string name="degree2">满足</string>
+    <string name="degree3">可以</string>
+    <string name="degree4">不足</string>
+    <string name="degree5">不满</string>
+
 </resources>
