@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:myRatingBar="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="100dp"
+    android:descendantFocusability="blocksDescendants"
+    android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/event_list_time_hight"
+        android:textSize="@dimen/event_list_time_textSize"
+        android:layout_marginLeft="5dp"
+        android:layout_alignParentLeft="true"
+        android:text="1.2 7:35"
+        android:id="@+id/start_time"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/event_list_time_hight"
+        android:textSize="@dimen/event_list_time_textSize"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentRight="true"
+        android:text="1.2 7:35"
+        android:id="@+id/end_time"/>
+    <ImageView
+        android:layout_marginTop="5dp"
+        android:layout_width="@dimen/important_instant_progress_size"
+        android:layout_height="@dimen/important_instant_progress_size"
+        android:layout_below="@id/end_time"
+        android:layout_alignStart="@id/start_time"
+        android:id="@+id/event_important"/>
+    <utility.SandyClock
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/end_time"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/event_instant"
+        android:layout_width="@dimen/important_instant_progress_size"
+        android:layout_height="@dimen/important_instant_progress_size"
+        myRatingBar:level="1"
+        android:clickable="false"
+        myRatingBar:offsetY="1px"
+        myRatingBar:widthX="18dp"
+        myRatingBar:click="false"
+        myRatingBar:lineColor="@color/lineColor"
+        myRatingBar:waterColor="@color/waterColor"
+        myRatingBar:dropColor="@color/dropColor"
+        myRatingBar:centerWidthX="2dp"
+        myRatingBar:centerHeightY="2dp"
+        myRatingBar:holeWidth="0.5dp"
+        myRatingBar:sandyLineWidth="3px"/>
+    <!--<ImageView-->
+        <!--android:layout_marginTop="5dp"-->
+        <!--android:layout_below="@id/end_time"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:id="@+id/event_instant"-->
+        <!--android:layout_width="@dimen/important_instant_progress_size"-->
+        <!--android:layout_height="@dimen/important_instant_progress_size" />-->
+
+
+    <ImageView
+        android:layout_marginTop="5dp"
+        android:layout_width="@dimen/important_instant_progress_size"
+        android:layout_height="@dimen/important_instant_progress_size"
+        android:id="@+id/event_progress"
+        android:layout_below="@+id/end_time"
+        android:layout_alignEnd="@+id/end_time" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:layout_below="@id/event_important"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:id="@+id/event_title"
+        android:textSize="10sp"/>
+</RelativeLayout>

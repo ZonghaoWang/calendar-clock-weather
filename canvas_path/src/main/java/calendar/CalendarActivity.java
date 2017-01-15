@@ -1,13 +1,21 @@
 package calendar;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -24,12 +32,23 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.example.jierui.canvas_path.R;
+
+import db.DegreeLevelDB;
+import db.EventRecordDB;
+import model.DegreeLevel;
+import model.EventRecord;
+import utility.EventAdapter;
+import weatherHelper.Heweather5;
+
+import static calendar.CalendarActivity.EventState.*;
 
 /**
  * 日历显示activity
@@ -67,6 +86,10 @@ public class CalendarActivity extends Activity implements View.OnClickListener {
 
 
     private int longClickedPosition;
+
+
+
+
     public CalendarActivity() {
 
         Date date = new Date();
@@ -96,8 +119,34 @@ public class CalendarActivity extends Activity implements View.OnClickListener {
         flipper.addView(gridView, 0);
         addTextToTopTextView(currentMonth);
         initPopWindow();
+        initNongLi();
+        initEventListPopWindow();
+        history_today = (ListView) findViewById(R.id.list_history_today);
+        spector_history_huodong = (ImageView) findViewById(R.id.spector_history_huodong);
+        layout_planing = (LinearLayout) findViewById(R.id.planing);
+        layout_history_today = (LinearLayout) findViewById(R.id.layout_history_today);
+        initEvent();
+        if (isExistHistory) {
+            HistoryTodayHelper historyTodayHelper = new HistoryTodayHelper(mHandler);
+        }
+
+        //
+        degreeLevelDB = DegreeLevelDB.getInstance(this);  //需要在oncreate中用this,不能声明变量时初始化
+        EventRecord eventRecord = new EventRecord();
+        eventRecord.setRecord("akdhakjdfha");
+        eventRecord.setLevel(2);
+        eventRecord.setTitle("wangzonghao");
+        eventRecord.setStartDateTime(new Date(System.currentTimeMillis()));
+        eventRecord.setProgress(23);
+        eventRecord.setState(2);
+        eventRecord.setEndDateTime(new Date(System.currentTimeMillis() + 1000));
+        eventRecord.setInstant(30);
+        int id = degreeLevelDB.saveEventRecord(eventRecord);
+
+        initEventListView();
     }
 
+    private DegreeLevelDB degreeLevelDB;
     private class MyGestureListener extends SimpleOnGestureListener {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -272,6 +321,11 @@ public class CalendarActivity extends Activity implements View.OnClickListener {
                 calV.setDaysDegree(longClickedPosition, 5);
                 mPopWindow.dismiss();
                 break;
+            // 描述活动列表状态的textview
+            case R.id.state_of_event:
+                currentEventState = getNextState();
+                state_of_event.setText(getAddressAndChangeAdapter(currentEventState));
+                break;
             default:
                 break;
         }
@@ -281,6 +335,9 @@ public class CalendarActivity extends Activity implements View.OnClickListener {
     private PopupWindow mPopWindow;
     private LinearLayout degree0, degree1, degree2, degree3, degree4, degree5;
     private TextView degree_calendar;
+    // 黄历
+    private TextView text_nongli, text_jieri, text_lifa, nongli_spector;
+    private ListView history_today;
 
     private void initPopWindow(){
         View contentView = LayoutInflater.from(CalendarActivity.this).inflate(R.layout.pop_window_lay, null);
@@ -304,6 +361,223 @@ public class CalendarActivity extends Activity implements View.OnClickListener {
         degree3.setOnClickListener(this);
         degree4.setOnClickListener(this);
         degree5.setOnClickListener(this);
+    }
+    private void initNongLi(){
+        text_nongli = (TextView) findViewById(R.id.text_nongli);
+        text_jieri = (TextView) findViewById(R.id.text_jieri);
+        text_lifa = (TextView) findViewById(R.id.text_lifa);
+        nongli_spector = (TextView) findViewById(R.id.nongli_spector);
+        text_nongli.setText("农历腊月二十");
+        text_jieri.setText("圣诞节");
+        text_jieri.setVisibility(View.GONE);
+        nongli_spector.setVisibility(View.GONE);
+        text_lifa.setText("丙申猴年");
+    }
+    private LinearLayout layout_planing, layout_history_today;
+    private ImageView spector_history_huodong;
+
+    private boolean isExistPlan = true;
+    private boolean isExistHistory = true;
+    private void initEvent(){
+        if (isExistPlan){
+            layout_planing.setVisibility(View.VISIBLE);
+            if (isExistHistory){
+                layout_history_today.setVisibility(View.VISIBLE);
+                spector_history_huodong.setVisibility(View.VISIBLE);
+            }else{
+                layout_history_today.setVisibility(View.GONE);
+                spector_history_huodong.setVisibility(View.GONE);
+            }
+        }else{
+            spector_history_huodong.setVisibility(View.GONE);
+        }
+
+    }
+    Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 0:
+                    //完成主界面更新,拿到数据
+                    HistoryTodayHelper historyTodayHelper = (HistoryTodayHelper) msg.obj;
+                    ArrayList<HashMap<String, String>> list_history_today = historyTodayHelper.getList();
+                    SimpleAdapter adapter_history_today, adapter_event;
+                    if (isExistPlan){
+                        layout_planing.setVisibility(View.VISIBLE);
+                        spector_history_huodong.setVisibility(View.VISIBLE);
+                        adapter_history_today = new SimpleAdapter(CalendarActivity.this, list_history_today, R.layout.history_today_item_dual, new String[]{"year", "event"}, new int[]{R.id.year, R.id.event});
+
+                    }else {
+                        layout_planing.setVisibility(View.GONE);
+                        spector_history_huodong.setVisibility(View.GONE);
+                        adapter_history_today = new SimpleAdapter(CalendarActivity.this, list_history_today, R.layout.history_today_item_single, new String[]{"year", "event"}, new int[]{R.id.year, R.id.event});
+                    }
+                    history_today.setAdapter(adapter_history_today);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+    };
+
+    /**
+     * event_list，配置活动列表list
+     */
+    private ListView huodong_list;
+    private TextView state_of_event;
+    private List<EventRecord> eventRecords_todo, eventRecords_doing, eventRecords_done, eventRecords_droped;
+    private EventAdapter eventAdapter_todo, eventAdapter_doing, eventAdapter_done, eventAdapter_droped;
+    public enum EventState{todo, doing, done, droped};
+    private EventState currentEventState = doing;
+    private EventState getNextState(){
+            switch(currentEventState){
+            case todo: return EventState.doing;
+            case doing: return EventState.done;
+            case done: return EventState.droped;
+            case droped: return EventState.todo;
+        }
+        return EventState.done;
+    }
+    private void initEventListView(){
+        huodong_list = (ListView) findViewById(R.id.huodong_list);
+        state_of_event = (TextView) findViewById(R.id.state_of_event);
+        eventRecords_todo = degreeLevelDB.loadEventRecord(1);
+        eventRecords_doing = degreeLevelDB.loadEventRecord(2);
+        eventRecords_done = degreeLevelDB.loadEventRecord(3);
+        eventRecords_droped = degreeLevelDB.loadEventRecord(4);
+        // 设置adapter
+        eventAdapter_todo = new EventAdapter(this, eventRecords_todo);
+        eventAdapter_doing = new EventAdapter(this, eventRecords_doing);
+        eventAdapter_done = new EventAdapter(this, eventRecords_done);
+        eventAdapter_droped = new EventAdapter(this, eventRecords_droped);
+
+        // 设置显示状态的textview的显示值
+        state_of_event.setOnClickListener(this);
+        state_of_event.setText(getAddressAndChangeAdapter(currentEventState));
+        huodong_list.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent();
+                intent.setClass(CalendarActivity.this, CreateRecord.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("EventRecord", getCurrentEventRecord(i));
+                bundle.putInt("index", i);
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 0);
+
+
+            }
+        });
+        huodong_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(CalendarActivity.this, "long", 2000).show();
+                return true;
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (resultCode) { //resultCode为回传的标记，我在B中回传的是RESULT_OK
+            case RESULT_OK:
+                Bundle b = data.getExtras(); //data为B中回传的Intent
+                int index = b.getInt("index");//str即为回传的值
+                EventRecord eventRecord = (EventRecord) b.getSerializable("EventRecord");
+                degreeLevelDB.saveEventRecord(eventRecord);
+                if (index != -1){
+                    setCurrentEventRecord(index, eventRecord);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    private void setCurrentEventRecord(int i, EventRecord eventRecord){
+        switch (currentEventState){
+            case todo:
+                eventAdapter_todo.changeItem(i, eventRecord);
+                break;
+            case doing:
+                eventAdapter_doing.changeItem(i, eventRecord);
+                break;
+            case done:
+                eventAdapter_done.changeItem(i, eventRecord);
+                break;
+            case droped:
+                eventAdapter_droped.changeItem(i, eventRecord);
+            default: eventRecords_doing.set(i, eventRecord);
+        }
+
+    }
+    private EventRecord getCurrentEventRecord(int i){
+        switch (currentEventState){
+            case todo: return eventRecords_todo.get(i);
+            case doing: return eventRecords_doing.get(i);
+            case done: return eventRecords_done.get(i);
+            case droped: return eventRecords_droped.get(i);
+            default: return eventRecords_doing.get(i);
+        }
+    }
+    /**
+     * @param  currentEventState 当前输入状态
+     * @deprecated 返回状态textview的描述至，并设置adapter
+     */
+
+    private int getAddressAndChangeAdapter(EventState currentEventState) {
+        switch (currentEventState){
+            case todo: huodong_list.setAdapter(eventAdapter_todo); return R.string.todo;
+            case doing: huodong_list.setAdapter(eventAdapter_doing);return R.string.doing;
+            case done: huodong_list.setAdapter(eventAdapter_done);return R.string.done;
+            case droped: huodong_list.setAdapter(eventAdapter_droped);return R.string.droped;
+            default: return R.string.todo;
+        }
+    }
+
+
+    /**
+     * 初始化活动列表
+     */
+    private TextView swithc_to_doing, swithc_to_todo, swithc_to_done, swithc_to_droped, swithc_delete;
+    private LinearLayout swithc_layout;
+    private PopupWindow stateEventSwitchPopWindow;
+    private void initEventListPopWindow(){
+        View contentView = LayoutInflater.from(CalendarActivity.this).inflate(R.layout.state_of_event_switch, null);
+        stateEventSwitchPopWindow = new PopupWindow(contentView,
+                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
+        stateEventSwitchPopWindow.setTouchable(true);
+        stateEventSwitchPopWindow.setFocusable(true);
+        stateEventSwitchPopWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        stateEventSwitchPopWindow.setOutsideTouchable(true);
+
+
+        swithc_layout = (LinearLayout) contentView.findViewById(R.id.swithc_layout);
+        swithc_to_doing = (TextView) contentView.findViewById(R.id.swithc_to_doing);
+        swithc_to_todo = (TextView) contentView.findViewById(R.id.swithc_to_todo);
+        swithc_to_done = (TextView) contentView.findViewById(R.id.swithc_to_done);
+        swithc_to_droped = (TextView) contentView.findViewById(R.id.swithc_to_droped);
+        swithc_delete = (TextView) contentView.findViewById(R.id.switch_delete);
+        swithc_to_doing.setOnClickListener(this);
+        swithc_to_todo.setOnClickListener(this);
+        swithc_to_done.setOnClickListener(this);
+        swithc_to_droped.setOnClickListener(this);
+        swithc_delete.setOnClickListener(this);
+    }
+    private void impactState(int index){
+
+        index = index - 1;
+        for (int i = 0; i < swithc_layout.getChildCount() - 1; i++){
+            if (i == index){
+                swithc_layout.getChildAt(i).setVisibility(View.GONE);
+            }else{
+                swithc_layout.getChildAt(i).setVisibility(View.VISIBLE);
+            }
+        }
     }
 
 

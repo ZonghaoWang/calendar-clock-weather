@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/colorAccent" android:maxLevel="1"/>
+    <item android:drawable="@color/colorPrimaryDark" android:maxLevel="2"/>
+    <item android:drawable="@color/holo_red_dark" android:maxLevel="3"/>
+    <item android:drawable="@color/holo_blue_bright" android:maxLevel="4"/>
+</level-list>

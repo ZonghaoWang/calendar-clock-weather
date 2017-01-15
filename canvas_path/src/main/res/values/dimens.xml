@@ -9,4 +9,13 @@
     <dimen name="degree_layout">25dp</dimen>
     <dimen name="degree_text_size">20sp</dimen>
 
+    <!--flipper下农历栏-->
+    <dimen name="text_nongli_marginleft">10dp</dimen>
+
+    <dimen name="state_switch">20dp</dimen>
+
+    <!--event litt-->
+    <dimen name="event_list_time_hight">12dp</dimen>
+    <dimen name="event_list_time_textSize">10sp</dimen>
+    <dimen name="important_instant_progress_size">25dp</dimen>
 </resources>

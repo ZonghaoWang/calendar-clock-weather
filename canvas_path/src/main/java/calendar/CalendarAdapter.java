@@ -175,7 +175,7 @@ public class CalendarAdapter extends BaseAdapter {
 
 		if (position < daysOfMonth + dayOfWeek && position >= dayOfWeek) {
 			if (showOtherDayDegree){
-				drawable = res.getDrawable(R.drawable.degree_bg);
+				drawable = res.getDrawable(R.drawable.other_pressed_bg);
 				drawable.setLevel(daysDegree[position]);
 				textView.setBackground(drawable);
 			}

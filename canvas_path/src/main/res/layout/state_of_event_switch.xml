@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="60dp"
+    android:id="@+id/swithc_layout"
+    android:layout_height="match_parent">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/state_switch"
+        android:background="@color/colorPrimary"
+        android:text="@string/switch_to"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/state_switch"
+        android:background="@drawable/pop_window_bg"
+        android:text="@string/doing"
+        android:id="@+id/swithc_to_doing"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/state_switch"
+        android:background="@drawable/pop_window_bg"
+        android:text="@string/todo"
+        android:id="@+id/swithc_to_todo"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/state_switch"
+        android:background="@drawable/pop_window_bg"
+        android:text="@string/done"
+        android:id="@+id/swithc_to_done"/>
+    <TextView
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/state_switch"
+    android:background="@drawable/pop_window_bg"
+    android:text="@string/droped"
+    android:id="@+id/swithc_to_droped"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/state_switch"
+        android:background="@drawable/pop_window_bg"
+        android:text="@string/delete"
+        android:textColor="@color/holo_red_light"
+        android:id="@+id/switch_delete"/>
+
+</LinearLayout>

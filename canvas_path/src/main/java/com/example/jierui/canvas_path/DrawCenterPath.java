@@ -206,6 +206,7 @@ public class DrawCenterPath extends View {
                     case R.styleable.DrawCenterPath_max_radius:
                         maxRadius = a.getDimensionPixelSize(attr, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DEFAULT_MAX_RADIUS, getResources().getDisplayMetrics()));
                         break;
+
                     default:
                         break;
                 }

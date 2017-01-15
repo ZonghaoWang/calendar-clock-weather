@@ -13,4 +13,33 @@
         <attr name="center_radius" format="dimension"/>
         <attr name="next_size" format="dimension"/>
     </declare-styleable>
+    <declare-styleable name="RatingBar">
+
+        <!-- 选中的图片资源 -->
+        <attr name="starSrc" format="reference" />
+        <!-- 未选中的图片资源 -->
+        <attr name="starDst" format="reference" />
+        <!-- boolean值 -->
+        <attr name="clickable" format="boolean" />
+        <attr name="step" format="float" />
+        <attr name="space" format="float" />
+        <attr name="starNumber" format="integer" />
+    </declare-styleable>
+    <declare-styleable name="SandyClock">
+        <attr name="level" format="integer"/>
+        <attr name="click" format="boolean"/>
+        <attr name="withAnmi" format="boolean"/>
+        <attr name="offsetY" format="dimension"/>  // 沙漏的上下offset
+        <attr name="widthX" format="dimension"/>   // 沙漏的口径
+        <attr name="lineColor" format="color"/>    // 沙漏颜色
+        <attr name="waterColor" format="color"/>   // 水的颜色
+        <attr name="dropColor" format="color" />   // 水滴的颜色
+        <attr name="sandyLineWidth" format="dimension"/>  // 画沙漏的画笔线宽
+        <attr name="distanceIO" format="dimension"/> //内外沙漏的距离
+        <attr name="centerHeightY" format="dimension"/> // 中间部分高度
+        <attr name="centerWidthX" format="dimension"/> // 中间部分宽度
+        <attr name="holeWidth" format="dimension"/>  // 漏洞宽度
+        <attr name="startPercent" format="float"/>
+        <attr name="percentStep" format="float"/>
+    </declare-styleable>
 </resources>

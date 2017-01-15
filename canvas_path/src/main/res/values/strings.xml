@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">canvas_path</string>
+    <string name="app_name2">canvas_path2</string>
     <string name="hello_world">Hello world!</string>
     <string name="aqi">空气质量指数</string>
     <string name="co">一氧化碳浓度</string>
@@ -23,5 +24,15 @@
     <string name="degree3">可以</string>
     <string name="degree4">不足</string>
     <string name="degree5">不满</string>
+
+    <string name="history_today">历史上的今天</string>
+    <string name="huodong_list">活动列表</string>
+    <!-- 活动的四中状态-->
+    <string name="doing">进行中</string>
+    <string name="todo">未开始</string>
+    <string name="done">已完成</string>
+    <string name="delete">删除...</string>
+    <string name="droped">已丢弃</string>
+    <string name="switch_to">移动到...</string>
 
 </resources>

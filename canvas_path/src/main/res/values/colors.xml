@@ -31,4 +31,9 @@
     <color name="holo_orange_dark">#ffff8800</color>
     <!-- A really bright Holo shade of blue -->
     <color name="holo_blue_bright">#ff00ddff</color>
+
+    <!-- 沙漏颜色设置，线颜色，沙子颜色，水滴颜色-->
+    <color name="lineColor">#ff00ddff</color>
+    <color name="waterColor">#55ff0000</color>
+    <color name="dropColor">#ff0000ff</color>
 </resources>
